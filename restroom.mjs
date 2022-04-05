@@ -19,18 +19,12 @@ import morgan from "morgan"
 import dotenv from "dotenv";
 dotenv.config();
 
-const port_1 = await getPort({port: portNumbers(3000, 10000)})
-const port_2 = await getPort({port: portNumbers(3000, 10000)})
-const HTTP_PORT = parseInt(process.env.HTTP_PORT || port_1, 10);
-const HTTPS_PORT = parseInt(process.env.HTTPS_PORT || port_2, 10);
+let HTTP_PORT = parseInt(process.env.HTTP_PORT, 10) || 0;
+let HTTPS_PORT = parseInt(process.env.HTTPS_PORT, 10) || 0;
 const HOST = process.env.HOST || "0.0.0.0";
 const ZENCODE_DIR = process.env.ZENCODE_DIR;
 const OPENAPI = JSON.parse(process.env.OPENAPI || true);
 
-if(!fs.existsSync(ZENCODE_DIR)) {
-  fs.mkdirSync(ZENCODE_DIR, { recursive: true });
-}
-fs.writeFileSync(path.join(ZENCODE_DIR, "identity.keys"), `{"identity":{"uid":"random","ip":"${HOST}","baseUrl":"http://${HOST}","port_http":"${HTTP_PORT}","port_https":"${HTTPS_PORT}","public_key":"BGiQeHz55rNc/k/iy7wLzR1jNcq/MOy8IyS6NBZ0kY3Z4sExlyFXcILcdmWDJZp8FyrILOC6eukLkRNt7Q5tzWU=","version":"2","announceAPI":"/api/consensusroom-announce","get-6-timestampsAPI":"/api/consensusroom-get-6-timestamps","timestampAPI":"/api/consensusroom-get-timestamp","tracker":"https://apiroom.net/"}}`)
 
 const app = express();
 
@@ -51,12 +45,15 @@ if (OPENAPI) {
 
 app.use("/api/*", zencode.default);
 
+if(!fs.existsSync(ZENCODE_DIR)) {
+  fs.mkdirSync(ZENCODE_DIR, { recursive: true });
+}
 const contracts = fs.readdirSync(ZENCODE_DIR);
 
 if (contracts.length > 0) {
-  const httpServer = http.createServer(app);
-  httpServer.listen(HTTP_PORT, HOST, () => {
-    console.log(`🚻 Restroom started on http://${chalk.bold.blue(HOST)}:${HTTP_PORT}`);
+  const httpStarted = () => {
+    fs.writeFileSync(path.join(ZENCODE_DIR, "identity.keys"), `{"identity":{"uid":"random","ip":"${HOST}","baseUrl":"http://${HOST}","port_http":"${HTTP_PORT}","port_https":"${HTTPS_PORT}","public_key":"BGiQeHz55rNc/k/iy7wLzR1jNcq/MOy8IyS6NBZ0kY3Z4sExlyFXcILcdmWDJZp8FyrILOC6eukLkRNt7Q5tzWU=","version":"2","announceAPI":"/api/consensusroom-announce","get-6-timestampsAPI":"/api/consensusroom-get-6-timestamps","timestampAPI":"/api/consensusroom-get-timestamp","tracker":"https://apiroom.net/"}}`)
+    console.log(`🚻 Restroom started on http://${chalk.bold.blue(HOST)}:${HTTP_PORT} and http://${chalk.bold.blue(HOST)}:${HTTPS_PORT}`);
     console.log(`📁 the ZENCODE directory is: ${chalk.magenta.underline(ZENCODE_DIR)} \n`);
 
     if (OPENAPI) {
@@ -70,6 +67,16 @@ if (contracts.length > 0) {
     readdirp(ZENCODE_DIR, { fileFilter: '*.zen|*.yaml|*.yml' }).on('data', (c) => {
       const endpoint = `/api/${c.path.replace('.zen', '')}`
       console.log(`\t${chalk.bold.green(endpoint)}`);
+    });
+  }
+
+  const httpServer = http.createServer(app);
+  httpServer.listen(HTTP_PORT, HOST, () => {
+    if(HTTP_PORT == 0) HTTP_PORT = httpServer.address().port
+    const httpsServer = http.createServer(app);
+    httpsServer.listen(HTTPS_PORT, HOST, () => {
+      if(HTTPS_PORT == 0) HTTPS_PORT = httpsServer.address().port
+      httpStarted()
     });
   });
 } else {

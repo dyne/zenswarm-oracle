@@ -1,4 +1,5 @@
 import fs from 'fs';
+import path from 'path'
 import readdirp from 'readdirp';
 import express from "express";
 import chalk from "chalk";
@@ -25,6 +26,11 @@ const HTTPS_PORT = parseInt(process.env.HTTPS_PORT || port_2, 10);
 const HOST = process.env.HOST || "0.0.0.0";
 const ZENCODE_DIR = process.env.ZENCODE_DIR;
 const OPENAPI = JSON.parse(process.env.OPENAPI || true);
+
+if(!fs.existsSync(ZENCODE_DIR)) {
+  fs.mkdirSync(ZENCODE_DIR, { recursive: true });
+}
+fs.writeFileSync(path.join(ZENCODE_DIR, "identity.keys"), `{"identity":{"uid":"random","ip":"${HOST}","baseUrl":"http://${HOST}","port_http":"${HTTP_PORT}","port_https":"${HTTPS_PORT}","public_key":"BGiQeHz55rNc/k/iy7wLzR1jNcq/MOy8IyS6NBZ0kY3Z4sExlyFXcILcdmWDJZp8FyrILOC6eukLkRNt7Q5tzWU=","version":"2","announceAPI":"/api/consensusroom-announce","get-6-timestampsAPI":"/api/consensusroom-get-6-timestamps","timestampAPI":"/api/consensusroom-get-timestamp","tracker":"https://apiroom.net/"}}`)
 
 const app = express();
 

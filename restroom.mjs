@@ -12,17 +12,99 @@ import rrredis from "@restroom-mw/redis";
 import sawroom from "@restroom-mw/sawroom";
 import timestamp from "@restroom-mw/timestamp";
 import ui from "@restroom-mw/ui";
-import getPort, {portNumbers} from 'get-port';
+import { zencode_exec } from "zenroom"
 
 import http from "http";
 import morgan from "morgan"
 import dotenv from "dotenv";
+import axios from 'axios';
 dotenv.config();
+
+const zen = async (zencode, keys, data) => {
+  const params = {};
+  if (keys !== undefined && keys !== null) {
+    params.keys = typeof keys === 'string' ? keys : JSON.stringify(keys);
+  }
+  if (data !== undefined && data !== null) {
+    params.data = typeof data === 'string' ? data : JSON.stringify(data);
+  }
+  try {
+    return await zencode_exec(zencode, params);
+  } catch (e) {
+    console.log("Error from zencode_exec: ", e);
+  }
+}
+
+const announce = (identity) => {
+  const data = {
+    "add-identity": "https://apiroom.net/api/dyneorg/consensusroom-server-add-identity",
+    "post": {
+      "data": {
+        "identity": identity
+      }
+    }
+  }
+
+  axios
+    .post(`http://${HOST}:${HTTP_PORT}/api/consensusroom-announce`, {"data": data})
+    .then( res => {
+      console.log("Announce done")
+    })
+    .catch(err => {
+      console.error("Error in announce contract");
+      process.exit(-1);
+    })
+};
+
+const saveVMLetStatus = async () => {
+  // generate private keys
+  const generatePrivateKeysScript = fs.readFileSync(path.join(PRIVATE_ZENCODE_DIR,
+                  "consensus-generate-all-private-keys.zen"), 'utf8')
+
+  const keys = await zen(generatePrivateKeysScript, null, null);
+  fs.writeFileSync(
+    path.join(ZENCODE_DIR, "consensusroom-generate-all-public-keys.keys"),
+    keys.result)
+  fs.writeFileSync(
+    path.join(ZENCODE_DIR, "keys.keys"),
+    keys.result)
+
+  // generate relative public keys
+  axios
+    .get(`http://${HOST}:${HTTP_PORT}/api/consensusroom-generate-all-public-keys`)
+    .then( res => {
+      // put all togheter in the identity
+      const identity = {
+        "uid":"random",
+        "ip":HOST,
+        "baseUrl":`http://${HOST}`,
+        "port_http":`${HTTP_PORT}`,
+        "port_https":`${HTTPS_PORT}`,
+        "version":"2",
+        "announceAPI":"/api/consensusroom-announce",
+        "get-6-timestampsAPI":"/api/consensusroom-get-6-timestamps",
+        "timestampAPI":"/api/consensusroom-get-timestamp",
+        "tracker":"https://apiroom.net/"
+      }
+      Object.assign(identity, res.data)
+      fs.writeFileSync(
+        path.join(ZENCODE_DIR, "identity.keys"),
+        JSON.stringify({"identity": identity}))
+
+      announce(identity)
+    })
+    .catch(_ => {
+      console.error("Error in generate public key contract");
+      process.exit(-1);
+    })
+
+}
 
 let HTTP_PORT = parseInt(process.env.HTTP_PORT, 10) || 0;
 let HTTPS_PORT = parseInt(process.env.HTTPS_PORT, 10) || 0;
 const HOST = process.env.HOST || "0.0.0.0";
 const ZENCODE_DIR = process.env.ZENCODE_DIR;
+const PRIVATE_ZENCODE_DIR = process.env.PRIVATE_ZENCODE_DIR;
 const OPENAPI = JSON.parse(process.env.OPENAPI || true);
 
 
@@ -51,8 +133,8 @@ if(!fs.existsSync(ZENCODE_DIR)) {
 const contracts = fs.readdirSync(ZENCODE_DIR);
 
 if (contracts.length > 0) {
-  const httpStarted = () => {
-    fs.writeFileSync(path.join(ZENCODE_DIR, "identity.keys"), `{"identity":{"uid":"random","ip":"${HOST}","baseUrl":"http://${HOST}","port_http":"${HTTP_PORT}","port_https":"${HTTPS_PORT}","public_key":"BGiQeHz55rNc/k/iy7wLzR1jNcq/MOy8IyS6NBZ0kY3Z4sExlyFXcILcdmWDJZp8FyrILOC6eukLkRNt7Q5tzWU=","version":"2","announceAPI":"/api/consensusroom-announce","get-6-timestampsAPI":"/api/consensusroom-get-6-timestamps","timestampAPI":"/api/consensusroom-get-timestamp","tracker":"https://apiroom.net/"}}`)
+  const httpStarted = async () => {
+    await saveVMLetStatus();
     console.log(`🚻 Restroom started on http://${chalk.bold.blue(HOST)}:${HTTP_PORT} and http://${chalk.bold.blue(HOST)}:${HTTPS_PORT}`);
     console.log(`📁 the ZENCODE directory is: ${chalk.magenta.underline(ZENCODE_DIR)} \n`);
 

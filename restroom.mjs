@@ -48,9 +48,9 @@ const announce = (identity) => {
   axios
     .post(`http://${HOST}:${HTTP_PORT}/api/consensusroom-announce`, {"data": data})
     .then( res => {
-      console.log("Announce done")
+      console.log(JSON.stringify(res.data))
     })
-    .catch(err => {
+    .catch( _ => {
       console.error("Error in announce contract");
       process.exit(-1);
     })
@@ -66,7 +66,7 @@ const saveVMLetStatus = async () => {
     path.join(ZENCODE_DIR, "consensusroom-generate-all-public-keys.keys"),
     keys.result)
   fs.writeFileSync(
-    path.join(ZENCODE_DIR, "keys.keys"),
+    path.join(ZENCODE_DIR, "keyring.json"),
     keys.result)
 
   // generate relative public keys

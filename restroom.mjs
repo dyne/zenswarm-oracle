@@ -62,6 +62,9 @@ const saveVMLetStatus = async () => {
                   "consensus-generate-all-private-keys.zen"), 'utf8')
 
   const keys = await zen(generatePrivateKeysScript, null, null);
+  if(!keys) {
+    process.exit(-1)
+  }
   fs.writeFileSync(
     path.join(ZENCODE_DIR, "consensusroom-generate-all-public-keys.keys"),
     keys.result)

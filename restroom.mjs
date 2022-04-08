@@ -87,7 +87,8 @@ const saveVMLetStatus = async () => {
         "announceAPI":"/api/consensusroom-announce",
         "get-6-timestampsAPI":"/api/consensusroom-get-6-timestamps",
         "timestampAPI":"/api/consensusroom-get-timestamp",
-        "tracker":"https://apiroom.net/"
+        "tracker":"https://apiroom.net/",
+        "type": "restroom-mw"
       }
       Object.assign(identity, res.data)
       fs.writeFileSync(

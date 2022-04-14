@@ -19,7 +19,8 @@ import morgan from "morgan"
 import dotenv from "dotenv";
 import axios from 'axios';
 dotenv.config();
-
+const MIN_PORT = 25000;
+const MAX_PORT = 30000;
 const zen = async (zencode, keys, data) => {
   const params = {};
   if (keys !== undefined && keys !== null) {
@@ -105,7 +106,11 @@ const saveVMLetStatus = async () => {
     })
 
 }
-
+function between(min, max) {
+  return Math.floor(
+    Math.random() * (max - min) + min
+  )
+}
 let HTTP_PORT = parseInt(process.env.HTTP_PORT, 10) || 0;
 let HTTPS_PORT = parseInt(process.env.HTTPS_PORT, 10) || 0;
 const HOST = process.env.HOST || "0.0.0.0";
@@ -159,14 +164,33 @@ if (contracts.length > 0) {
   }
 
   const httpServer = http.createServer(app);
-  httpServer.listen(HTTP_PORT, HOST, () => {
-    if(HTTP_PORT == 0) HTTP_PORT = httpServer.address().port
-    const httpsServer = http.createServer(app);
-    httpsServer.listen(HTTPS_PORT, HOST, () => {
-      if(HTTPS_PORT == 0) HTTPS_PORT = httpsServer.address().port
-      httpStarted()
-    });
-  });
+  if(HTTP_PORT == 0) HTTP_PORT = between(MIN_PORT, MAX_PORT);
+  let found = false;
+  while(!found) {
+    found = true;
+    try {
+      httpServer.listen(HTTP_PORT, HOST, () => {
+        if(HTTPS_PORT == 0) HTTPS_PORT = between(MIN_PORT, MAX_PORT);
+        let found = false;
+        while(!found) {
+          found = true;
+          try {
+            const httpsServer = http.createServer(app);
+            httpsServer.listen(HTTPS_PORT, HOST, () => {
+              if(HTTPS_PORT == 0) HTTPS_PORT = httpsServer.address().port
+              httpStarted()
+            });
+          } catch(e) {
+            found = false;
+            HTTPS_PORT = between(MIN_PORT, MAX_PORT);
+          }
+        }
+      });
+    } catch(e) {
+      found = false;
+      HTTP_PORT = between(MIN_PORT, MAX_PORT);
+    }
+  }
 } else {
   console.log(`🚨 The ${chalk.magenta.underline(ZENCODE_DIR)} folder is empty, please add some ZENCODE smart contract before running Restroom`);
 }

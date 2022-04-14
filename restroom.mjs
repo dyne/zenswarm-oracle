@@ -79,7 +79,7 @@ const saveVMLetStatus = async () => {
     .then( res => {
       // put all togheter in the identity
       const identity = {
-        "uid":"random",
+        "uid":`${HOST}:${HTTP_PORT}`,
         "ip":HOST,
         "baseUrl":`http://${HOST}`,
         "port_http":`${HTTP_PORT}`,
@@ -169,14 +169,14 @@ if (contracts.length > 0) {
   while(!found) {
     found = true;
     try {
-      httpServer.listen(HTTP_PORT, HOST, () => {
+      httpServer.listen(HTTP_PORT, () => {
         if(HTTPS_PORT == 0) HTTPS_PORT = between(MIN_PORT, MAX_PORT);
         let found = false;
         while(!found) {
           found = true;
           try {
             const httpsServer = http.createServer(app);
-            httpsServer.listen(HTTPS_PORT, HOST, () => {
+            httpsServer.listen(HTTPS_PORT, () => {
               if(HTTPS_PORT == 0) HTTPS_PORT = httpsServer.address().port
               httpStarted()
             });

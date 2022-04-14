@@ -47,7 +47,7 @@ const announce = (identity) => {
   }
 
   axios
-    .post(`http://${HOST}:${HTTP_PORT}/api/consensusroom-announce`, {"data": data})
+    .post(`http://127.0.0.1:${HTTP_PORT}/api/consensusroom-announce`, {"data": data})
     .then( res => {
       console.log(JSON.stringify(res.data))
     })
@@ -75,7 +75,7 @@ const saveVMLetStatus = async () => {
 
   // generate relative public keys
   axios
-    .get(`http://${HOST}:${HTTP_PORT}/api/consensusroom-generate-all-public-keys`)
+    .get(`http://127.0.0.1:${HTTP_PORT}/api/consensusroom-generate-all-public-keys`)
     .then( res => {
       // put all togheter in the identity
       const identity = {

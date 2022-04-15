@@ -11,6 +11,7 @@ import rrhttp from "@restroom-mw/http";
 import rrredis from "@restroom-mw/redis";
 import sawroom from "@restroom-mw/sawroom";
 import timestamp from "@restroom-mw/timestamp";
+import files from "@restroom-mw/files";
 import ui from "@restroom-mw/ui";
 import { zencode_exec } from "zenroom"
 
@@ -132,6 +133,7 @@ app.use(rrhttp.default);
 app.use(rrredis.default);
 app.use(sawroom.default);
 app.use(timestamp.default);
+app.use(files.default);
 if (OPENAPI) {
   app.use("/docs", ui.default({ path: ZENCODE_DIR }));
 }

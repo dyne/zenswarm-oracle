@@ -19,6 +19,9 @@ import http from "http";
 import morgan from "morgan"
 import dotenv from "dotenv";
 import axios from 'axios';
+import chokidar from 'chokidar';
+import yaml from 'js-yaml';
+
 dotenv.config();
 const MIN_PORT = 25000;
 const MAX_PORT = 30000;
@@ -35,6 +38,56 @@ const zen = async (zencode, keys, data) => {
   } catch (e) {
     console.log("Error from zencode_exec: ", e);
   }
+}
+
+const intervalIDs = []
+
+const startL1Cron = (path) => {
+  // clean all intervals
+  while(intervalIDs.length > 0) {
+    clearInterval(intervalIDs.pop())
+  }
+
+  fs.readFile(path, (err, data) => {
+    if(err) {
+      console.error("Could not read L1 nodes");
+      return;
+    }
+    //start the new ones as in the file
+    data = yaml.load(data);
+    console.log(`UPDATE_L1_LIST ${Date.now()}`)
+    if(!data) {
+      console.log("Could not read YAML")
+      return;
+    }
+
+    Object.keys(data.ledgers).forEach( (key) => {
+      const ledger = data.ledgers[key];
+      const fnLogger = msg => console.log(`POLLING ${key} ${Date.now()} ${msg}`)
+      if(ledger.interval > 0) {
+        intervalIDs.push(setInterval(() => {
+          axios
+            .post(`http://127.0.0.1:${HTTP_PORT}/api/${ledger.contract}`)
+            .then( res => {
+              fnLogger(JSON.stringify(res.data))
+            })
+            .catch( err => {
+              fnLogger(JSON.stringify(err))
+            })
+        }, ledger.interval * 1000))
+      }
+    })
+  });
+
+
+}
+
+const startL1Watcher = () => {
+  const file = path.join(FILES_DIR, L1NODES);
+  //startL1Cron(file);
+  chokidar.watch(file).on('all', (_, path) => {
+    startL1Cron(path);
+  });
 }
 
 const announce = (identity) => {
@@ -56,6 +109,7 @@ const announce = (identity) => {
       console.error("Error in announce contract");
       process.exit(-1);
     })
+  startL1Watcher();
 };
 
 const saveVMLetStatus = async () => {
@@ -118,6 +172,8 @@ const HOST = process.env.HOST || "0.0.0.0";
 const ZENCODE_DIR = process.env.ZENCODE_DIR;
 const PRIVATE_ZENCODE_DIR = process.env.PRIVATE_ZENCODE_DIR;
 const OPENAPI = JSON.parse(process.env.OPENAPI || true);
+const L1NODES = process.env.L1NODES || "L1.yaml";
+const FILES_DIR = process.env.FILES_DIR || "contracts";
 
 
 const app = express();

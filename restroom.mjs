@@ -145,6 +145,7 @@ const saveVMLetStatus = async () => {
         "timestampAPI":"/api/consensusroom-get-timestamp",
         "updateAPI":"/api/consensusroom-update",
         "http-postAPI": "/api/consensusroom-http-post",
+        "pingAPI" : "/api/consensusroom-ping",
         "tracker":"https://apiroom.net/",
         "type": "restroom-mw",
         "region": "0"

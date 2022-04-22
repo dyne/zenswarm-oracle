@@ -168,6 +168,33 @@ function between(min, max) {
     Math.random() * (max - min) + min
   )
 }
+
+function startHttp(initial_port, callback) {
+  let port = initial_port;
+  const httpServer = http.createServer(app);
+  let retry = 1000;
+  if(port <= 0) port = between(MIN_PORT, MAX_PORT);
+  console.log(`CHOSEN_HTTP_PORT ${port}`)
+  httpServer.listen(port, function() {
+    console.log(`LISTENING ${httpServer.address().port}`);
+    callback();
+  }).on('error', function(err) {
+    console.log(`ERROR ${err.code}`)
+    if(err.code == 'EADDRINUSE') {
+      port = between(MIN_PORT, MAX_PORT);
+      console.log(`CHOSEN_HTTP_PORT ${port}`)
+      if(retry-- > 0)
+        httpServer.listen(port);
+      else
+        throw new Error("Could not find a free port")
+    } else {
+      console.log(err);
+      process.exit(-1);
+    }
+  });
+  return port
+}
+
 let HTTP_PORT = parseInt(process.env.HTTP_PORT, 10) || 0;
 let HTTPS_PORT = parseInt(process.env.HTTPS_PORT, 10) || 0;
 const HOST = process.env.HOST || "0.0.0.0";
@@ -222,35 +249,10 @@ if (contracts.length > 0) {
       console.log(`\t${chalk.bold.green(endpoint)}`);
     });
   }
+  HTTP_PORT = startHttp(HTTP_PORT, () => {
+    HTTPS_PORT = startHttp(HTTPS_PORT, httpStarted);
+  });
 
-  const httpServer = http.createServer(app);
-  if(HTTP_PORT == 0) HTTP_PORT = between(MIN_PORT, MAX_PORT);
-  let found = false;
-  while(!found) {
-    found = true;
-    try {
-      httpServer.listen(HTTP_PORT, () => {
-        if(HTTPS_PORT == 0) HTTPS_PORT = between(MIN_PORT, MAX_PORT);
-        let found = false;
-        while(!found) {
-          found = true;
-          try {
-            const httpsServer = http.createServer(app);
-            httpsServer.listen(HTTPS_PORT, () => {
-              if(HTTPS_PORT == 0) HTTPS_PORT = httpsServer.address().port
-              httpStarted()
-            });
-          } catch(e) {
-            found = false;
-            HTTPS_PORT = between(MIN_PORT, MAX_PORT);
-          }
-        }
-      });
-    } catch(e) {
-      found = false;
-      HTTP_PORT = between(MIN_PORT, MAX_PORT);
-    }
-  }
 } else {
   console.log(`🚨 The ${chalk.magenta.underline(ZENCODE_DIR)} folder is empty, please add some ZENCODE smart contract before running Restroom`);
 }

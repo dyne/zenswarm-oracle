@@ -21,6 +21,7 @@ import dotenv from "dotenv";
 import axios from 'axios';
 import chokidar from 'chokidar';
 import yaml from 'js-yaml';
+import WebSocket from 'ws';
 
 dotenv.config();
 const MIN_PORT = 25000;
@@ -104,12 +105,14 @@ const announce = (identity) => {
     .post(`http://127.0.0.1:${HTTP_PORT}/api/consensusroom-announce`, {"data": data})
     .then( res => {
       console.log(JSON.stringify(res.data))
+      startL1Watcher();
+      subscribeEth();
     })
-    .catch( _ => {
+    .catch( e => {
+      console.log(e)
       console.error("Error in announce contract");
       process.exit(-1);
     })
-  startL1Watcher();
 };
 
 const saveVMLetStatus = async () => {
@@ -149,7 +152,7 @@ const saveVMLetStatus = async () => {
         "http-postAPI" : "/api/consensusroom-http-post",
         "tracker":"https://apiroom.net/",
         "type": "restroom-mw",
-        "region": "0"
+        "region": REGION
       }
       Object.assign(identity, res.data)
       fs.writeFileSync(
@@ -158,7 +161,7 @@ const saveVMLetStatus = async () => {
 
       announce(identity)
     })
-    .catch(_ => {
+    .catch(e => {
       console.error("Error in generate public key contract");
       process.exit(-1);
     })
@@ -204,6 +207,8 @@ const PRIVATE_ZENCODE_DIR = process.env.PRIVATE_ZENCODE_DIR;
 const OPENAPI = JSON.parse(process.env.OPENAPI || true);
 const L1NODES = process.env.L1NODES || "L1.yaml";
 const FILES_DIR = process.env.FILES_DIR || "contracts";
+const REGION = process.env.REGION || "0";
+const WS_ETH = process.env.WS_ETH || "ws://78.47.38.223:8546"
 
 
 const app = express();
@@ -233,6 +238,7 @@ const contracts = fs.readdirSync(ZENCODE_DIR);
 
 if (contracts.length > 0) {
   const httpStarted = async () => {
+    process.env.HTTPS_PORT = HTTPS_PORT;
     await saveVMLetStatus();
     console.log(`🚻 Restroom started on http://${chalk.bold.blue(HOST)}:${HTTP_PORT} and http://${chalk.bold.blue(HOST)}:${HTTPS_PORT}`);
     console.log(`📁 the ZENCODE directory is: ${chalk.magenta.underline(ZENCODE_DIR)} \n`);
@@ -251,6 +257,7 @@ if (contracts.length > 0) {
     });
   }
   HTTP_PORT = startHttp(HTTP_PORT, () => {
+    process.env.HTTP_PORT = HTTP_PORT;
     HTTPS_PORT = startHttp(HTTPS_PORT, httpStarted);
   });
 
@@ -258,3 +265,27 @@ if (contracts.length > 0) {
   console.log(`🚨 The ${chalk.magenta.underline(ZENCODE_DIR)} folder is empty, please add some ZENCODE smart contract before running Restroom`);
 }
 
+function subscribeEth() {
+  try {
+    const ws = new WebSocket(WS_ETH);
+    ws.onopen = function() {
+      ws.send(JSON.stringify({
+        id: 1,
+        jsonrpc:"2.0",
+        method: "eth_subscribe",
+        params: ["newHeads"]
+      }));
+      ws.onmessage = function(event) {
+        const msg = JSON.parse(event.data)
+        if(msg.method && msg.method == "eth_subscription") {
+          const block = msg.params.result;
+          console.log("ETH_NEW_HEAD " + block.hash);
+        }
+      }
+    }
+  } catch(e) {
+    console.log("COuld not start eth web socket");
+    console.log(e)
+    process.exit(-1);
+  }
+}

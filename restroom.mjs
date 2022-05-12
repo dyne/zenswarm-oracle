@@ -152,7 +152,8 @@ const saveVMLetStatus = async () => {
         "http-postAPI" : "/api/consensusroom-http-post",
         "tracker":"https://apiroom.net/",
         "type": "restroom-mw",
-        "region": REGION
+        "region": REGION,
+        "country": `${COUNTRY}`
       }
       Object.assign(identity, res.data)
       fs.writeFileSync(
@@ -202,12 +203,13 @@ function startHttp(initial_port, callback) {
 let HTTP_PORT = parseInt(process.env.HTTP_PORT, 10) || 0;
 let HTTPS_PORT = parseInt(process.env.HTTPS_PORT, 10) || 0;
 const HOST = process.env.HOST || "0.0.0.0";
+const COUNTRY = process.env.COUNTRY || "NONE";
 const ZENCODE_DIR = process.env.ZENCODE_DIR;
 const PRIVATE_ZENCODE_DIR = process.env.PRIVATE_ZENCODE_DIR;
 const OPENAPI = JSON.parse(process.env.OPENAPI || true);
 const L1NODES = process.env.L1NODES || "L1.yaml";
 const FILES_DIR = process.env.FILES_DIR || "contracts";
-const REGION = process.env.REGION || "0";
+const REGION = process.env.REGION || "NONE";
 const WS_ETH = process.env.WS_ETH || "ws://78.47.38.223:8546"
 
 

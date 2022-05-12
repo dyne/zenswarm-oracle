@@ -105,8 +105,9 @@ const announce = (identity) => {
     .post(`http://127.0.0.1:${HTTP_PORT}/api/consensusroom-announce`, {"data": data})
     .then( res => {
       console.log(JSON.stringify(res.data))
-      startL1Watcher();
+      //startL1Watcher();
       subscribeEth();
+      subscribeSaw();
     })
     .catch( e => {
       console.log(e)
@@ -212,6 +213,9 @@ const L1NODES = process.env.L1NODES || "L1.yaml";
 const FILES_DIR = process.env.FILES_DIR || "contracts";
 const REGION = process.env.REGION || "NONE";
 const WS_ETH = process.env.WS_ETH || "ws://78.47.38.223:8546"
+const HTTP_ETH = process.env.HTTP_ETH || "http://78.47.38.223:8545"
+const WS_SAW = process.env.WS_SAW || "ws://195.201.41.35:8008/subscriptions"
+const HTTP_SAW = process.env.HTTP_SAW || "http://195.201.41.35:8008/"
 
 
 const app = express();
@@ -272,17 +276,65 @@ function subscribeEth() {
   try {
     const ws = new WebSocket(WS_ETH);
     ws.onopen = function() {
+      const id = Math.floor(Math.random() * 65536);
+      let subscriptionId = null;
       ws.send(JSON.stringify({
-        id: 1,
+        id,
         jsonrpc:"2.0",
         method: "eth_subscribe",
         params: ["newHeads"]
       }));
-      ws.onmessage = function(event) {
-        const msg = JSON.parse(event.data)
-        if(msg.method && msg.method == "eth_subscription") {
+      const processMsg = function(event) {
+        let msg = JSON.parse(event.data)
+        if(msg.method == "eth_subscription"
+           && msg.params && msg.params.subscription == subscriptionId) {
           const block = msg.params.result;
+          msg['endpoint'] = HTTP_ETH;
           console.log("ETH_NEW_HEAD " + block.hash);
+          axios.post('https://apiroom.net/api/dyneebsi/ethereum-notarization.chain',
+            {data: msg}).then(function(data) {
+              console.warn(data.data);
+            });
+        }
+      }
+      ws.onmessage = function(e) {
+        const msg = JSON.parse(e.data);
+        if(msg.result && msg.id == id) {
+          subscriptionId = msg.result
+          // from now on messages will be processed as blocks
+          ws.onmessage = processMsg;
+        }
+
+      }
+    }
+  } catch(e) {
+    console.log("COuld not start eth web socket");
+    console.log(e)
+    process.exit(-1);
+  }
+}
+
+
+function subscribeSaw() {
+  try {
+    const ws = new WebSocket(WS_SAW);
+    ws.onopen = function() {
+      ws.send(JSON.stringify({
+        action: "subscribe"
+      }));
+      ws.onmessage = function(event) {
+        try {
+          let msg = JSON.parse(event.data)
+          const block = msg.block_id;
+          msg['endpoint'] = HTTP_SAW;
+          console.log("SAW_NEW_HEAD " + block);
+          //console.log(msg)
+          /*axios.post('https://apiroom.net/api/dyneebsi/sawroom-notarization.chain', {data: msg})
+            .then(function(data) {
+              console.log(data);
+            })*/
+        } catch(e) {
+          console.warn(`WS SAW ERROR: ${e}`)
         }
       }
     }

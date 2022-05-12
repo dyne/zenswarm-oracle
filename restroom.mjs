@@ -93,7 +93,7 @@ const startL1Watcher = () => {
 
 const announce = (identity) => {
   const data = {
-    "add-identity": "https://apiroom.net/api/dyneorg/consensusroom-server-add-identity",
+    "add-identity": "https://apiroom.net/api/dyneorg/zenswarm-server-add-identity",
     "post": {
       "data": {
         "identity": identity

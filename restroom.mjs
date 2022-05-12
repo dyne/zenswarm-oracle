@@ -150,7 +150,7 @@ const saveVMLetStatus = async () => {
         "http-postAPI": "/api/consensusroom-http-post",
         "pingAPI" : "/api/consensusroom-ping",
         "http-postAPI" : "/api/consensusroom-http-post",
-        "oracle-key-issuance": "zenswarm-oracle-key-issuance.chain",
+        "oracle-key-issuance": "/api/zenswarm-oracle-key-issuance.chain",
         "tracker":"https://apiroom.net/",
         "type": "restroom-mw",
         "region": REGION,

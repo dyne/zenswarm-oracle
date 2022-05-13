@@ -34,7 +34,7 @@ const blockchainDB = JSON.parse(
   await readFile(
     new URL('./blockchain_db.json', import.meta.url)
   )
-);
+).subscriptions;
 
 /*
  * Run a zenroom script (outside restroom mw)
@@ -378,15 +378,19 @@ const subscribeFn = {
 }
 
 function dispatchSubscriptions() {
+  if(SUBSCRIPTIONS == '')
+    return;
   SUBSCRIPTIONS.split(" ").forEach( (v) => {
     try {
       const blockchain = blockchainDB[v]
       if(!blockchain) {
         console.log("UNKNOWN_BLOCKCHAIN " + v);
+        return
       }
       const fn = subscribeFn[blockchain['type']];
       if(!fn) {
         console.log("UNKNOWN_SUBSCRIPTION " + v);
+        return
       }
       fn(blockchain);
     } catch(e) {

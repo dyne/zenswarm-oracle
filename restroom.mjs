@@ -234,7 +234,7 @@ const OPENAPI = JSON.parse(process.env.OPENAPI || true);
 const L1NODES = process.env.L1NODES || "L1.yaml";
 const FILES_DIR = process.env.FILES_DIR || "contracts";
 const REGION = process.env.REGION || "NONE";
-const SUBSCRIPTIONS = process.env.SUBSCRIPTIONS || "fabchain sawroom"
+const SUBSCRIPTIONS = process.env.SUBSCRIPTIONS || "";
 
 const app = express();
 

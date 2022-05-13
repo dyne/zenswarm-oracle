@@ -41,6 +41,7 @@
     "zenroom": "next"
   },
   "devDependencies": {
+    "@types/ws": "^8.5.3",
     "body-parser": "^1.19.2",
     "chalk": "5.0.1",
     "get-port": "^6.1.2",

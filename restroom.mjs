@@ -26,6 +26,19 @@ import WebSocket from 'ws';
 dotenv.config();
 const MIN_PORT = 25000;
 const MAX_PORT = 30000;
+/*
+ * Load current L1 blockchains database
+ */
+import { readFile } from 'fs/promises';
+const blockchainDB = JSON.parse(
+  await readFile(
+    new URL('./blockchain_db.json', import.meta.url)
+  )
+);
+
+/*
+ * Run a zenroom script (outside restroom mw)
+ */
 const zen = async (zencode, keys, data) => {
   const params = {};
   if (keys !== undefined && keys !== null) {
@@ -41,6 +54,9 @@ const zen = async (zencode, keys, data) => {
   }
 }
 
+/*
+ * Monitor file with L1 data to be monitored
+ */
 const intervalIDs = []
 
 const startL1Cron = (path) => {
@@ -79,8 +95,6 @@ const startL1Cron = (path) => {
       }
     })
   });
-
-
 }
 
 const startL1Watcher = () => {
@@ -91,6 +105,9 @@ const startL1Watcher = () => {
   });
 }
 
+/*
+ * Post announce message to Issuer
+ */
 const announce = (identity) => {
   const data = {
     "add-identity": "https://apiroom.net/api/dyneorg/zenswarm-server-add-identity",
@@ -106,8 +123,7 @@ const announce = (identity) => {
     .then( res => {
       console.log(JSON.stringify(res.data))
       //startL1Watcher();
-      subscribeEth();
-      subscribeSaw();
+      dispatchSubscriptions();
     })
     .catch( e => {
       console.log(e)
@@ -116,6 +132,9 @@ const announce = (identity) => {
     })
 };
 
+/*
+ * Create VMLet identity
+ */
 const saveVMLetStatus = async () => {
   // generate private keys
   const generatePrivateKeysScript = fs.readFileSync(path.join(PRIVATE_ZENCODE_DIR,
@@ -168,8 +187,11 @@ const saveVMLetStatus = async () => {
       console.error("Error in generate public key contract");
       process.exit(-1);
     })
-
 }
+
+/*
+ * Utils: generate a random number between min and max
+ */
 function between(min, max) {
   return Math.floor(
     Math.random() * (max - min) + min
@@ -212,11 +234,7 @@ const OPENAPI = JSON.parse(process.env.OPENAPI || true);
 const L1NODES = process.env.L1NODES || "L1.yaml";
 const FILES_DIR = process.env.FILES_DIR || "contracts";
 const REGION = process.env.REGION || "NONE";
-const WS_ETH = process.env.WS_ETH || "ws://78.47.38.223:8546"
-const HTTP_ETH = process.env.HTTP_ETH || "http://78.47.38.223:8545"
-const WS_SAW = process.env.WS_SAW || "ws://195.201.41.35:8008/subscriptions"
-const HTTP_SAW = process.env.HTTP_SAW || "http://195.201.41.35:8008/"
-
+const SUBSCRIPTIONS = process.env.SUBSCRIPTIONS || "fabchain sawroom"
 
 const app = express();
 
@@ -272,9 +290,12 @@ if (contracts.length > 0) {
   console.log(`🚨 The ${chalk.magenta.underline(ZENCODE_DIR)} folder is empty, please add some ZENCODE smart contract before running Restroom`);
 }
 
-function subscribeEth() {
+/*
+ * Subscribe to ETH node
+ */
+function subscribeEth(blockchain) {
   try {
-    const ws = new WebSocket(WS_ETH);
+    const ws = new WebSocket(blockchain.ws);
     ws.onopen = function() {
       const id = Math.floor(Math.random() * 65536);
       let subscriptionId = null;
@@ -289,7 +310,7 @@ function subscribeEth() {
         if(msg.method == "eth_subscription"
            && msg.params && msg.params.subscription == subscriptionId) {
           const block = msg.params.result;
-          msg['endpoint'] = HTTP_ETH;
+          msg['endpoint'] = blockchain.http;
           console.log("ETH_NEW_HEAD " + block.hash);
           axios.post('https://apiroom.net/api/dyneebsi/ethereum-notarization.chain',
             {data: msg}).then(function(data) {
@@ -308,18 +329,20 @@ function subscribeEth() {
         }
 
       }
+      ws.onclose = function() {
+        console.warn("ETH_CLOSE")
+      }
     }
   } catch(e) {
-    console.log("COuld not start eth web socket");
-    console.log(e)
+    console.log(`ETH_WS_ERROR ${e}`);
     process.exit(-1);
   }
 }
 
 
-function subscribeSaw() {
+function subscribeSaw(blockchain) {
   try {
-    const ws = new WebSocket(WS_SAW);
+    const ws = new WebSocket(blockchain.ws);
     ws.onopen = function() {
       ws.send(JSON.stringify({
         action: "subscribe"
@@ -328,7 +351,7 @@ function subscribeSaw() {
         try {
           let msg = JSON.parse(event.data)
           const block = msg.block_id;
-          msg['endpoint'] = HTTP_SAW;
+          msg['endpoint'] = blockchain.http;
           console.log("SAW_NEW_HEAD " + block);
           //console.log(msg)
           /*axios.post('https://apiroom.net/api/dyneebsi/sawroom-notarization.chain', {data: msg})
@@ -336,13 +359,38 @@ function subscribeSaw() {
               console.log(data);
             })*/
         } catch(e) {
-          console.warn(`WS SAW ERROR: ${e}`)
+          console.warn(`SAW_WS_ERROR: ${e}`)
         }
+      }
+      ws.onclose = function() {
+        console.warn("SAW_CLOSE")
       }
     }
   } catch(e) {
-    console.log("COuld not start eth web socket");
-    console.log(e)
+    console.log(`SAW_WS_ERROR ${e}`);
     process.exit(-1);
   }
+}
+
+const subscribeFn = {
+  "ethereum": subscribeEth,
+  "sawtooth": subscribeSaw
+}
+
+function dispatchSubscriptions() {
+  SUBSCRIPTIONS.split(" ").forEach( (v) => {
+    try {
+      const blockchain = blockchainDB[v]
+      if(!blockchain) {
+        console.log("UNKNOWN_BLOCKCHAIN " + v);
+      }
+      const fn = subscribeFn[blockchain['type']];
+      if(!fn) {
+        console.log("UNKNOWN_SUBSCRIPTION " + v);
+      }
+      fn(blockchain);
+    } catch(e) {
+      console.warn(e)
+    }
+  });
 }

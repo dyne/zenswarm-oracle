@@ -172,6 +172,8 @@ const saveVMLetStatus = async () => {
         "http-postAPI" : "/api/consensusroom-http-post",
         "oracle-key-issuance": "/api/zenswarm-oracle-key-issuance.chain",
         "tracker":"https://apiroom.net/",
+        "ethereum-notarizationAPI":"/api/ethereum-notarization.chain",
+        "get-identityAPI":"/api/get-identity",
         "type": "restroom-mw",
         "region": REGION,
         "country": `${COUNTRY}`

@@ -180,7 +180,7 @@ const saveVMLetStatus = async () => {
       }
       Object.assign(identity, res.data)
       fs.writeFileSync(
-        path.join(ZENCODE_DIR, "identity.keys"),
+        path.join(ZENCODE_DIR, "identity.json"),
         JSON.stringify({"identity": identity}))
 
       announce(identity)

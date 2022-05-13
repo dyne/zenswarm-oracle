@@ -293,7 +293,9 @@ function subscribeEth() {
           console.log("ETH_NEW_HEAD " + block.hash);
           axios.post('https://apiroom.net/api/dyneebsi/ethereum-notarization.chain',
             {data: msg}).then(function(data) {
-              console.warn(data.data);
+              console.log(`ETH_NOTARIZE ${data.data.txid}`);
+            }).catch(function(e) {
+              console.warn(`ETH_NOTARIZE_ERROR ${e}`)
             });
         }
       }

@@ -400,26 +400,26 @@ const subscribeFn = {
 
 function dispatchSubscriptions() {
   let subscriptions = {}
-  if(SUBSCRIPTIONS == '')
-    return;
-  SUBSCRIPTIONS.split(" ").forEach( (v) => {
-    try {
-      const blockchain = blockchainDB[v]
-      if(!blockchain) {
-        console.log("UNKNOWN_BLOCKCHAIN " + v);
-        return
+  if(SUBSCRIPTIONS != '') {
+    SUBSCRIPTIONS.split(" ").forEach( (v) => {
+      try {
+        const blockchain = blockchainDB[v]
+        if(!blockchain) {
+          console.log("UNKNOWN_BLOCKCHAIN " + v);
+          return
+        }
+        const fn = subscribeFn[blockchain['type']];
+        if(!fn) {
+          console.log("UNKNOWN_SUBSCRIPTION " + v);
+          return
+        }
+        subscriptions[v] = blockchain;
+        fn({name: v, ...blockchain});
+      } catch(e) {
+        console.warn(e)
       }
-      const fn = subscribeFn[blockchain['type']];
-      if(!fn) {
-        console.log("UNKNOWN_SUBSCRIPTION " + v);
-        return
-      }
-      subscriptions[v] = blockchain;
-      fn({name: v, ...blockchain});
-    } catch(e) {
-      console.warn(e)
-    }
-  });
+    });
+  }
   fs.writeFileSync(
     path.join(ZENCODE_DIR, "blockchain-subscriptions.json"),
     JSON.stringify({subscriptions}));

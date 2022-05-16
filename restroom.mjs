@@ -399,6 +399,7 @@ const subscribeFn = {
 }
 
 function dispatchSubscriptions() {
+  let subscriptions = {}
   if(SUBSCRIPTIONS == '')
     return;
   SUBSCRIPTIONS.split(" ").forEach( (v) => {
@@ -413,9 +414,13 @@ function dispatchSubscriptions() {
         console.log("UNKNOWN_SUBSCRIPTION " + v);
         return
       }
+      subscriptions[v] = blockchain;
       fn({name: v, ...blockchain});
     } catch(e) {
       console.warn(e)
     }
   });
+  fs.writeFileSync(
+    path.join(ZENCODE_DIR, "blockchain-subscriptions.json"),
+    JSON.stringify({subscriptions}));
 }

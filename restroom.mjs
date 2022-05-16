@@ -119,7 +119,7 @@ const startL1Watcher = () => {
  */
 const announce = (identity) => {
   const data = {
-    "add-identity": "https://apiroom.net/api/dyneorg/zenswarm-server-add-identity",
+    "add-identity": "https://apiroom.net/api/zenswarm/zenswarm-issuer-add-identity.chain",
     "post": {
       "data": {
         "identity": identity
@@ -371,6 +371,8 @@ function subscribeSaw(blockchain) {
           let msg = JSON.parse(event.data)
           const block = msg.block_id;
           msg['endpoint'] = blockchain.http;
+          Object.assign(msg, {blockchain})
+          console.log(msg)
           L.info("SAW_NEW_HEAD " + block);
           //console.log(msg)
           /*axios.post('https://apiroom.net/api/dyneebsi/sawroom-notarization.chain', {data: msg})
@@ -411,7 +413,7 @@ function dispatchSubscriptions() {
         console.log("UNKNOWN_SUBSCRIPTION " + v);
         return
       }
-      fn(blockchain);
+      fn({name: v, ...blockchain});
     } catch(e) {
       console.warn(e)
     }

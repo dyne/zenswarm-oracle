@@ -16,14 +16,23 @@ import ui from "@restroom-mw/ui";
 import { zencode_exec } from "zenroom"
 
 import http from "http";
-import morgan from "morgan"
+import morgan from "morgan";
+import winston from "winston";
 import dotenv from "dotenv";
 import axios from 'axios';
 import chokidar from 'chokidar';
 import yaml from 'js-yaml';
 import WebSocket from 'ws';
+import readLastLines from 'read-last-lines';
 
 dotenv.config();
+const L = new winston.createLogger({
+  level: 'debug',
+  transports: [
+    new winston.transports.File({ filename: './access.log', level: 'debug' }),
+  ],
+  exitOnError: false
+});
 const MIN_PORT = 25000;
 const MAX_PORT = 30000;
 /*
@@ -242,7 +251,7 @@ const app = express();
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(morgan("dev"));
+app.use(morgan('combined', { stream: L.stream.write }))
 app.set("json spaces", 2);
 
 app.use(db.default);
@@ -257,6 +266,14 @@ if (OPENAPI) {
 }
 
 app.use("/api/*", zencode.default);
+app.get('/logs', async (req, res) => {
+  const logs = await readLastLines.read('./access.log', 200)
+  res.send(logs)
+})
+app.use(function(err, req, res, next) {
+  L.error(`${req.method} - ${err.message}  - ${req.originalUrl} - ${req.ip}`);
+  next(err)
+})
 
 if(!fs.existsSync(ZENCODE_DIR)) {
   fs.mkdirSync(ZENCODE_DIR, { recursive: true });
@@ -313,12 +330,12 @@ function subscribeEth(blockchain) {
            && msg.params && msg.params.subscription == subscriptionId) {
           const block = msg.params.result;
           msg['endpoint'] = blockchain.http;
-          console.log("ETH_NEW_HEAD " + block.hash);
+          L.info("ETH_NEW_HEAD " + block.hash);
           axios.post('https://apiroom.net/api/dyneebsi/ethereum-notarization.chain',
             {data: msg}).then(function(data) {
-              console.log(`ETH_NOTARIZE ${data.data.txid}`);
+              L.info(`ETH_NOTARIZE ${data.data.txid}`);
             }).catch(function(e) {
-              console.warn(`ETH_NOTARIZE_ERROR ${e}`)
+              L.warn(`ETH_NOTARIZE_ERROR ${e}`)
             });
         }
       }
@@ -332,11 +349,11 @@ function subscribeEth(blockchain) {
 
       }
       ws.onclose = function() {
-        console.warn("ETH_CLOSE")
+        Log.warn("ETH_CLOSE")
       }
     }
   } catch(e) {
-    console.log(`ETH_WS_ERROR ${e}`);
+    L.error(`ETH_WS_ERROR ${e}`);
     process.exit(-1);
   }
 }
@@ -354,22 +371,22 @@ function subscribeSaw(blockchain) {
           let msg = JSON.parse(event.data)
           const block = msg.block_id;
           msg['endpoint'] = blockchain.http;
-          console.log("SAW_NEW_HEAD " + block);
+          L.info("SAW_NEW_HEAD " + block);
           //console.log(msg)
           /*axios.post('https://apiroom.net/api/dyneebsi/sawroom-notarization.chain', {data: msg})
             .then(function(data) {
               console.log(data);
             })*/
         } catch(e) {
-          console.warn(`SAW_WS_ERROR: ${e}`)
+          L.warn(`SAW_WS_ERROR: ${e}`)
         }
       }
       ws.onclose = function() {
-        console.warn("SAW_CLOSE")
+        L.warn("SAW_CLOSE")
       }
     }
   } catch(e) {
-    console.log(`SAW_WS_ERROR ${e}`);
+    L.error(`SAW_WS_ERROR ${e}`);
     process.exit(-1);
   }
 }

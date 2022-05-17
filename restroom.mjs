@@ -180,6 +180,7 @@ const saveVMLetStatus = async () => {
         "oracle-key-issuance": "/api/zenswarm-oracle-key-issuance.chain",
         "tracker":"https://apiroom.net/",
         "ethereum-notarizationAPI":"/api/ethereum-notarization.chain",
+        "sawroom-notarizationAPI":"/api/sawroom-notarization.chain",
         "get-identityAPI":"/api/zenswarm-oracle-get-identity",
         "type": "restroom-mw",
         "region": REGION,

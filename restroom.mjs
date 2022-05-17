@@ -128,7 +128,7 @@ const announce = (identity) => {
   }
 
   axios
-    .post(`http://127.0.0.1:${HTTP_PORT}/api/consensusroom-announce`, {"data": data})
+    .post(`http://127.0.0.1:${HTTP_PORT}/api/zenswarm-oracle-announce`, {"data": data})
     .then( res => {
       console.log(JSON.stringify(res.data))
       //startL1Watcher();
@@ -154,7 +154,7 @@ const saveVMLetStatus = async () => {
     process.exit(-1)
   }
   fs.writeFileSync(
-    path.join(ZENCODE_DIR, "consensusroom-generate-all-public-keys.keys"),
+    path.join(ZENCODE_DIR, "zenswarm-oracle-generate-all-public-keys.keys"),
     keys.result)
   fs.writeFileSync(
     path.join(ZENCODE_DIR, "keyring.json"),
@@ -162,7 +162,7 @@ const saveVMLetStatus = async () => {
 
   // generate relative public keys
   axios
-    .get(`http://127.0.0.1:${HTTP_PORT}/api/consensusroom-generate-all-public-keys`)
+    .get(`http://127.0.0.1:${HTTP_PORT}/api/zenswarm-oracle-generate-all-public-keys`)
     .then( res => {
       // put all togheter in the identity
       const identity = {
@@ -172,9 +172,9 @@ const saveVMLetStatus = async () => {
         "port_http":`${HTTP_PORT}`,
         "port_https":`${HTTPS_PORT}`,
         "version":"2",
-        "announceAPI":"/api/consensusroom-announce",
+        "announceAPI":"/api/zenswarm-oracle-announce",
         "timestampAPI":"/api/zenswarm-oracle-get-timestamp.zen",
-        "updateAPI":"/api/consensusroom-update",
+        "updateAPI":"/api/zenswarm-oracle-update",
         "http-postAPI": "/api/zenswarm-oracle-http-post",
         "pingAPI" : "/api/zenswarm-oracle-ping.zen",
         "oracle-key-issuance": "/api/zenswarm-oracle-key-issuance.chain",

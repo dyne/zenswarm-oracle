@@ -253,6 +253,12 @@ app.use(bodyParser.json());
 app.use(morgan('combined', { stream: L.stream.write }))
 app.set("json spaces", 2);
 
+// Used by the dashboard
+app.use(function(req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    next();
+});
+
 app.use(db.default);
 app.use(fabric.default);
 app.use(rrhttp.default);
@@ -329,6 +335,7 @@ function subscribeEth(blockchain) {
            && msg.params && msg.params.subscription == subscriptionId) {
           const block = msg.params.result;
           msg['endpoint'] = blockchain.http;
+          Object.assign(msg, {blockchain})
           L.info("ETH_NEW_HEAD " + block.hash);
           axios.post('https://apiroom.net/api/dyneebsi/ethereum-notarization.chain',
             {data: msg}).then(function(data) {

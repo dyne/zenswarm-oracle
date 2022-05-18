@@ -266,6 +266,7 @@ app.use(fabric.default);
 app.use(rrhttp.default);
 app.use(rrredis.default);
 app.use(sawroom.default);
+app.use(ethereum.default);
 app.use(timestamp.default);
 app.use(files.default);
 if (OPENAPI) {

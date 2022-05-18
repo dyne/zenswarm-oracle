@@ -381,13 +381,13 @@ function subscribeSaw(blockchain) {
           const block = msg.block_id;
           msg['endpoint'] = blockchain.http;
           Object.assign(msg, {blockchain})
-          console.log(msg)
           L.info("SAW_NEW_HEAD " + block);
-          //console.log(msg)
-          /*axios.post('https://apiroom.net/api/dyneebsi/sawroom-notarization.chain', {data: msg})
-            .then(function(data) {
-              console.log(data);
-            })*/
+          axios.post(`http://127.0.0.1:${HTTP_PORT}/api/sawtooth-notarization.chain`,
+            {data: msg}).then(function(data) {
+              L.info(`SAW_NOTARIZE ${data.data.txid}`);
+            }).catch(function(e) {
+              L.warn(`SAW_NOTARIZE_ERROR ${e}`)
+            });
         } catch(e) {
           L.warn(`SAW_WS_ERROR: ${e}`)
         }

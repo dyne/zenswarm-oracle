@@ -340,7 +340,7 @@ function subscribeEth(blockchain) {
           msg['endpoint'] = blockchain.http;
           Object.assign(msg, {blockchain})
           L.info("ETH_NEW_HEAD " + block.hash);
-          axios.post(`http://127.0.0.1:${HTTP_PORT}/api/ethereum-notarization.chain`,
+          axios.post(`http://127.0.0.1:${HTTP_PORT}/api/ethereum-to-ethereum-notarization.chain`,
             {data: msg}).then(function(data) {
               L.info(`ETH_NOTARIZE ${data.data.txid}`);
             }).catch(function(e) {
@@ -382,7 +382,7 @@ function subscribeSaw(blockchain) {
           msg['endpoint'] = blockchain.http;
           Object.assign(msg, {blockchain})
           L.info("SAW_NEW_HEAD " + block);
-          axios.post(`http://127.0.0.1:${HTTP_PORT}/api/sawroom-notarization.chain`,
+          axios.post(`http://127.0.0.1:${HTTP_PORT}/api/sawroom-to-ethereum-notarization.chain`,
             {data: msg}).then(function(data) {
               L.info(`SAW_NOTARIZE ${data.data.txid}`);
             }).catch(function(e) {

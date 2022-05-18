@@ -10,6 +10,7 @@ import fabric from "@restroom-mw/fabric";
 import rrhttp from "@restroom-mw/http";
 import rrredis from "@restroom-mw/redis";
 import sawroom from "@restroom-mw/sawroom";
+import ethereum from "@restroom-mw/ethereum";
 import timestamp from "@restroom-mw/timestamp";
 import files from "@restroom-mw/files";
 import ui from "@restroom-mw/ui";

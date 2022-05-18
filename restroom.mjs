@@ -382,7 +382,7 @@ function subscribeSaw(blockchain) {
           msg['endpoint'] = blockchain.http;
           Object.assign(msg, {blockchain})
           L.info("SAW_NEW_HEAD " + block);
-          axios.post(`http://127.0.0.1:${HTTP_PORT}/api/sawtooth-notarization.chain`,
+          axios.post(`http://127.0.0.1:${HTTP_PORT}/api/sawroom-notarization.chain`,
             {data: msg}).then(function(data) {
               L.info(`SAW_NOTARIZE ${data.data.txid}`);
             }).catch(function(e) {

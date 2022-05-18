@@ -195,6 +195,7 @@ const saveVMLetStatus = async () => {
     })
     .catch(e => {
       console.error("Error in generate public key contract");
+      console.error(e)
       process.exit(-1);
     })
 }
@@ -337,7 +338,7 @@ function subscribeEth(blockchain) {
           msg['endpoint'] = blockchain.http;
           Object.assign(msg, {blockchain})
           L.info("ETH_NEW_HEAD " + block.hash);
-          axios.post('https://apiroom.net/api/dyneebsi/ethereum-notarization.chain',
+          axios.post(`http://127.0.0.1:${HTTP_PORT}/api/ethereum-notarization.chain`,
             {data: msg}).then(function(data) {
               L.info(`ETH_NOTARIZE ${data.data.txid}`);
             }).catch(function(e) {

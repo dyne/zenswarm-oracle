@@ -410,7 +410,9 @@ function subscribeIota(blockchain) {
     client.subscribe('milestones/latest');
     client.on('message', function(topic, message) {
       try {
-        let msg = JSON.parse(message.toString('utf-8'));
+	let msg = JSON.parse(message.toString('utf-8'));
+	msg[ 'index' ] = msg[ 'index' ].toString();
+	msg[ 'timestamp' ] = msg[ 'timestamp' ].toString();
         const block_index = msg.index;
 	msg[ 'endpoint' ] = blockchain.http;
 	Object.assign(msg, {blockchain});

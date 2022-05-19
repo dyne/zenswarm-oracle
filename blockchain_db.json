@@ -7,8 +7,8 @@
     },
     "sawroom": {
       "type": "sawtooth",
-      "http": "http://195.201.41.35:8008",
-      "ws": "ws://195.201.41.35:8008/subscriptions"
+      "http": "http://195.201.42.48:8008",
+      "ws": "ws://195.201.42.48:8008/subscriptions"
     }
   }
 }

@@ -260,8 +260,8 @@ app.set("json spaces", 2);
 
 // Used by the dashboard
 app.use(function(req, res, next) {
-    res.header('Access-Control-Allow-Origin', '*');
-    next();
+  res.header('Access-Control-Allow-Origin', '*');
+  next();
 });
 
 app.use(db.default);
@@ -338,7 +338,7 @@ function subscribeEth(blockchain) {
       const processMsg = function(event) {
         let msg = JSON.parse(event.data)
         if(msg.method == "eth_subscription"
-           && msg.params && msg.params.subscription == subscriptionId) {
+          && msg.params && msg.params.subscription == subscriptionId) {
           const block = msg.params.result;
           msg['endpoint'] = blockchain.http;
           Object.assign(msg, {blockchain})

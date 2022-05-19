@@ -148,7 +148,7 @@ const announce = (identity) => {
 const saveVMLetStatus = async () => {
   // generate private keys
   const generatePrivateKeysScript = fs.readFileSync(path.join(PRIVATE_ZENCODE_DIR,
-                  "consensus-generate-all-private-keys.zen"), 'utf8')
+    "consensus-generate-all-private-keys.zen"), 'utf8')
   let keyring = { "ed25519_keypair": { "private_key":"5Jgk9ARKbPXRwPCuVHv94M4q9iKpF67Apk6hP3rRLtby", "public_key": "Mx2D1WbAdREJphfuAcRCge54zMndKfmozynzRZYP5aw"}};
   const keys = await zen(generatePrivateKeysScript, null, null);
   if(!keys) {
@@ -411,27 +411,27 @@ function subscribeIota(blockchain) {
     client.subscribe('milestones/latest');
     client.on('message', function(topic, message) {
       try {
-	let msg = JSON.parse(message.toString('utf-8'));
-	msg[ 'index' ] = msg[ 'index' ].toString();
-	msg[ 'timestamp' ] = msg[ 'timestamp' ].toString();
+        let msg = JSON.parse(message.toString('utf-8'));
+        msg[ 'index' ] = msg[ 'index' ].toString();
+        msg[ 'timestamp' ] = msg[ 'timestamp' ].toString();
         const block_index = msg.index;
-	msg[ 'endpoint' ] = blockchain.http;
-	Object.assign(msg, {blockchain});
+        msg[ 'endpoint' ] = blockchain.http;
+        Object.assign(msg, {blockchain});
         L.info("IOTA_NEW_HEAD " + block_index);
-	axios.get(`${blockchain.http}api/v1/milestones/${block_index}`)
-	  .then(function(res) {
-	    msg[ 'messageId' ] = res.data.data.messageId;
-	    L.info(`IOTA_ID: ${res.data.data.messageId}`);
-	    axios.get(`${blockchain.http}api/v1/messages/${msg.messageId}`)
-	      .then(function(res) {
-		Object.assign(msg, {parentMessageIds: res.data.data.parentMessageIds});
-		axios.post(`http://127.0.0.1:${HTTP_PORT}/api/iota-to-ethereum-notarization.chain`,
-			   {data: msg}).then(function(data) {
-			     L.info(`IOTA_NOTARIZE ${data.data.txid}`);
-			   }).catch(function(e) {
-			     L.warn(`IOTA_NOTARIZE_ERROR ${e}`)
-			   });
-	      })
+        axios.get(`${blockchain.http}api/v1/milestones/${block_index}`)
+          .then(function(res) {
+            msg[ 'messageId' ] = res.data.data.messageId;
+            L.info(`IOTA_ID: ${res.data.data.messageId}`);
+            axios.get(`${blockchain.http}api/v1/messages/${msg.messageId}`)
+              .then(function(res) {
+                Object.assign(msg, {parentMessageIds: res.data.data.parentMessageIds});
+                axios.post(`http://127.0.0.1:${HTTP_PORT}/api/iota-to-ethereum-notarization.chain`,
+                  {data: msg}).then(function(data) {
+                    L.info(`IOTA_NOTARIZE ${data.data.txid}`);
+                  }).catch(function(e) {
+                    L.warn(`IOTA_NOTARIZE_ERROR ${e}`)
+                  });
+              })
           }).catch(function(e) {
             L.warn(`IOTA_MESSAGE_ID_ERROR ${e}`);
           });

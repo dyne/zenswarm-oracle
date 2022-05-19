@@ -31,6 +31,7 @@
     "extract-zip": "2.0.1",
     "js-yaml": "^4.1.0",
     "mariadb": "^2.5.4",
+    "mqtt": "^4.3.7",
     "mysql2": "^2.2.5",
     "read-last-lines": "^1.8.0",
     "redis": "^4.0.2",

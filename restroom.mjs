@@ -15,6 +15,7 @@ import timestamp from "@restroom-mw/timestamp";
 import files from "@restroom-mw/files";
 import ui from "@restroom-mw/ui";
 import { zencode_exec } from "zenroom"
+import mqtt from "mqtt"
 
 import http from "http";
 import morgan from "morgan";
@@ -120,7 +121,7 @@ const startL1Watcher = () => {
  */
 const announce = (identity) => {
   const data = {
-    "add-identity": "https://apiroom.net/api/zenswarm/zenswarm-issuer-add-identity.chain",
+    "add-identity": ANNOUNCE_URL,
     "post": {
       "data": {
         "identity": identity
@@ -136,7 +137,6 @@ const announce = (identity) => {
       dispatchSubscriptions();
     })
     .catch( e => {
-      console.log(e)
       console.error("Error in announce contract");
       process.exit(-1);
     })
@@ -149,17 +149,19 @@ const saveVMLetStatus = async () => {
   // generate private keys
   const generatePrivateKeysScript = fs.readFileSync(path.join(PRIVATE_ZENCODE_DIR,
                   "consensus-generate-all-private-keys.zen"), 'utf8')
-
+  let keyring = { "ed25519_keypair": { "private_key":"5Jgk9ARKbPXRwPCuVHv94M4q9iKpF67Apk6hP3rRLtby", "public_key": "Mx2D1WbAdREJphfuAcRCge54zMndKfmozynzRZYP5aw"}};
   const keys = await zen(generatePrivateKeysScript, null, null);
   if(!keys) {
     process.exit(-1)
   }
+  Object.assign(keyring, JSON.parse(keys.result))
+
   fs.writeFileSync(
     path.join(ZENCODE_DIR, "zenswarm-oracle-generate-all-public-keys.keys"),
     keys.result)
   fs.writeFileSync(
     path.join(ZENCODE_DIR, "keyring.json"),
-    keys.result)
+    JSON.stringify(keyring))
 
   // generate relative public keys
   axios
@@ -247,6 +249,7 @@ const L1NODES = process.env.L1NODES || "L1.yaml";
 const FILES_DIR = process.env.FILES_DIR || "contracts";
 const REGION = process.env.REGION || "NONE";
 const SUBSCRIPTIONS = process.env.SUBSCRIPTIONS || "";
+const ANNOUNCE_URL = process.env.ANNOUNCE_URL || "https://apiroom.net/api/zenswarm/zenswarm-issuer-add-identity.chain";
 
 const app = express();
 
@@ -402,9 +405,50 @@ function subscribeSaw(blockchain) {
   }
 }
 
+function subscribeIota(blockchain) {
+  try {
+    const client = mqtt.connect(blockchain.mqtt);
+    client.subscribe('milestones/latest');
+    client.on('message', function(topic, message) {
+      try {
+	let msg = JSON.parse(message.toString('utf-8'));
+	msg[ 'index' ] = msg[ 'index' ].toString();
+	msg[ 'timestamp' ] = msg[ 'timestamp' ].toString();
+        const block_index = msg.index;
+	msg[ 'endpoint' ] = blockchain.http;
+	Object.assign(msg, {blockchain});
+        L.info("IOTA_NEW_HEAD " + block_index);
+	axios.get(`${blockchain.http}api/v1/milestones/${block_index}`)
+	  .then(function(res) {
+	    msg[ 'messageId' ] = res.data.data.messageId;
+	    L.info(`IOTA_ID: ${res.data.data.messageId}`);
+	    axios.get(`${blockchain.http}api/v1/messages/${msg.messageId}`)
+	      .then(function(res) {
+		Object.assign(msg, {parentMessageIds: res.data.data.parentMessageIds});
+		axios.post(`http://127.0.0.1:${HTTP_PORT}/api/iota-to-ethereum-notarization.chain`,
+			   {data: msg}).then(function(data) {
+			     L.info(`IOTA_NOTARIZE ${data.data.txid}`);
+			   }).catch(function(e) {
+			     L.warn(`IOTA_NOTARIZE_ERROR ${e}`)
+			   });
+	      })
+          }).catch(function(e) {
+            L.warn(`IOTA_MESSAGE_ID_ERROR ${e}`);
+          });
+      } catch(e) {
+        L.warn(`IOTA_MESSAGE_ERROR: ${e}`);
+      }
+    });
+  } catch(e) {
+    L.error(`IOTA_MQTT_ERROR ${e}`);
+    process.exit(-1);
+  }
+}
+
 const subscribeFn = {
   "ethereum": subscribeEth,
-  "sawtooth": subscribeSaw
+  "sawtooth": subscribeSaw,
+  "iota": subscribeIota
 }
 
 function dispatchSubscriptions() {

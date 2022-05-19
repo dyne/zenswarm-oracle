@@ -9,6 +9,11 @@
       "type": "sawtooth",
       "http": "http://195.201.41.35:8008",
       "ws": "ws://195.201.41.35:8008/subscriptions"
+    },
+    "iota_devnet": {
+      "type": "iota",
+      "http": "https://api.lb-0.h.chrysalis-devnet.iota.cafe/",
+      "mqtt": "mqtt://mqtt.lb-0.h.chrysalis-devnet.iota.cafe:1883"
     }
   }
 }

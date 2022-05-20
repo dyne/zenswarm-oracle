@@ -120,7 +120,7 @@ const startL1Watcher = () => {
 const deannounce = (identity) => {
   axios.post(DEANNOUNCE_URL, identity)
     .then( res => {
-      L.info("GRACEFULL_SHOTDOWN");
+      L.info("GRACEFUL_SHUTDOWN");
       process.exit(0);
     })
     .catch( e => {
@@ -444,8 +444,8 @@ function subscribeIota(blockchain) {
               .then(function(res) {
                 Object.assign(msg, {parentMessageIds: res.data.data.parentMessageIds});
                 axios.post(notarizationUrl("iota"), {data: msg})
-                      .then(function(data) {
-                          console.log(data.data);
+                  .then(function(data) {
+                    console.log(data.data);
                     L.info(`IOTA_NOTARIZE ${data.data.txid}`);
                   }).catch(function(e) {
                     L.warn(`IOTA_NOTARIZE_ERROR ${e}`)
@@ -486,7 +486,7 @@ function dispatchSubscriptions() {
           return
         }
         subscriptions[v] = blockchain;
-        fn(blockchain);
+        fn({...blockchain, name: `${v}-${L0_DEST}`});
       } catch(e) {
         console.warn(e)
       }
@@ -496,11 +496,3 @@ function dispatchSubscriptions() {
     path.join(ZENCODE_DIR, "blockchain-subscriptions.json"),
     JSON.stringify({subscriptions}));
 }
-
-
-// graceful shutdown
-process.on('SIGINT', function() {
-   db.stop(function(err) {
-     process.exit(err ? 1 : 0)
-   })
-})

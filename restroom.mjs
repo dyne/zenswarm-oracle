@@ -46,6 +46,7 @@ const blockchainDB = JSON.parse(
     new URL('./blockchain_db.json', import.meta.url)
   )
 ).subscriptions;
+Object.keys(blockchainDB).forEach(key => blockchainDB[key].name = key);
 
 /*
  * Run a zenroom script (outside restroom mw)
@@ -472,7 +473,7 @@ function dispatchSubscriptions() {
           return
         }
         subscriptions[v] = blockchain;
-        fn({name: v, ...blockchain});
+        fn(blockchain);
       } catch(e) {
         console.warn(e)
       }
@@ -482,3 +483,11 @@ function dispatchSubscriptions() {
     path.join(ZENCODE_DIR, "blockchain-subscriptions.json"),
     JSON.stringify({subscriptions}));
 }
+
+
+// graceful shutdown
+process.on('SIGINT', function() {
+   db.stop(function(err) {
+     process.exit(err ? 1 : 0)
+   })
+})

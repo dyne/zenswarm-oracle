@@ -14,6 +14,11 @@
       "type": "iota",
       "api": "https://api.lb-0.h.chrysalis-devnet.iota.cafe/",
       "sub": "mqtt://mqtt.lb-0.h.chrysalis-devnet.iota.cafe:1883"
+    },
+    "rinkeby": {
+      "type": "ethereum",
+      "api": "https://rinkeby-light.eth.linkpool.io",
+      "sub": "wss://rinkeby-light.eth.linkpool.io/ws"
     }
   }
 }

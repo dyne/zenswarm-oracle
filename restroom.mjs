@@ -250,6 +250,7 @@ const FILES_DIR = process.env.FILES_DIR || "contracts";
 const REGION = process.env.REGION || "NONE";
 const SUBSCRIPTIONS = process.env.SUBSCRIPTIONS || "";
 const ANNOUNCE_URL = process.env.ANNOUNCE_URL || "https://apiroom.net/api/zenswarm/zenswarm-issuer-add-identity.chain";
+const L0_DEST = process.env.L0_DEST || "planetmint";
 
 const app = express();
 
@@ -320,12 +321,16 @@ if (contracts.length > 0) {
   console.log(`🚨 The ${chalk.magenta.underline(ZENCODE_DIR)} folder is empty, please add some ZENCODE smart contract before running Restroom`);
 }
 
+function notarizationUrl(from) {
+  return `http://127.0.0.1:${HTTP_PORT}/api/${from}-to-${L0_DEST}-notarization.chain`;
+}
+
 /*
  * Subscribe to ETH node
  */
 function subscribeEth(blockchain) {
   try {
-    const ws = new WebSocket(blockchain.ws);
+    const ws = new WebSocket(blockchain.sub);
     ws.onopen = function() {
       const id = Math.floor(Math.random() * 65536);
       let subscriptionId = null;
@@ -340,11 +345,11 @@ function subscribeEth(blockchain) {
         if(msg.method == "eth_subscription"
           && msg.params && msg.params.subscription == subscriptionId) {
           const block = msg.params.result;
-          msg['endpoint'] = blockchain.http;
+          msg['endpoint'] = blockchain.api;
           Object.assign(msg, {blockchain})
           L.info("ETH_NEW_HEAD " + block.hash);
-          axios.post(`http://127.0.0.1:${HTTP_PORT}/api/ethereum-to-ethereum-notarization.chain`,
-            {data: msg}).then(function(data) {
+          axios.post(notarizationUrl("ethereum"), {data: msg})
+           .then(function(data) {
               L.info(`ETH_NOTARIZE ${data.data.txid}`);
             }).catch(function(e) {
               L.warn(`ETH_NOTARIZE_ERROR ${e}`)
@@ -373,7 +378,7 @@ function subscribeEth(blockchain) {
 
 function subscribeSaw(blockchain) {
   try {
-    const ws = new WebSocket(blockchain.ws);
+    const ws = new WebSocket(blockchain.sub);
     ws.onopen = function() {
       ws.send(JSON.stringify({
         action: "subscribe"
@@ -382,11 +387,11 @@ function subscribeSaw(blockchain) {
         try {
           let msg = JSON.parse(event.data)
           const block = msg.block_id;
-          msg['endpoint'] = blockchain.http;
+          msg['endpoint'] = blockchain.api;
           Object.assign(msg, {blockchain})
           L.info("SAW_NEW_HEAD " + block);
-          axios.post(`http://127.0.0.1:${HTTP_PORT}/api/sawroom-to-ethereum-notarization.chain`,
-            {data: msg}).then(function(data) {
+          axios.post(notarizationUrl("sawroom"), {data: msg})
+            .then(function(data) {
               L.info(`SAW_NOTARIZE ${data.data.txid}`);
             }).catch(function(e) {
               L.warn(`SAW_NOTARIZE_ERROR ${e}`)
@@ -407,7 +412,7 @@ function subscribeSaw(blockchain) {
 
 function subscribeIota(blockchain) {
   try {
-    const client = mqtt.connect(blockchain.mqtt);
+    const client = mqtt.connect(blockchain.sub);
     client.subscribe('milestones/latest');
     client.on('message', function(topic, message) {
       try {
@@ -415,18 +420,18 @@ function subscribeIota(blockchain) {
         msg[ 'index' ] = msg[ 'index' ].toString();
         msg[ 'timestamp' ] = msg[ 'timestamp' ].toString();
         const block_index = msg.index;
-        msg[ 'endpoint' ] = blockchain.http;
+        msg[ 'endpoint' ] = blockchain.api;
         Object.assign(msg, {blockchain});
         L.info("IOTA_NEW_HEAD " + block_index);
-        axios.get(`${blockchain.http}api/v1/milestones/${block_index}`)
+        axios.get(`${blockchain.api}api/v1/milestones/${block_index}`)
           .then(function(res) {
             msg[ 'messageId' ] = res.data.data.messageId;
             L.info(`IOTA_ID: ${res.data.data.messageId}`);
-            axios.get(`${blockchain.http}api/v1/messages/${msg.messageId}`)
+            axios.get(`${blockchain.api}api/v1/messages/${msg.messageId}`)
               .then(function(res) {
                 Object.assign(msg, {parentMessageIds: res.data.data.parentMessageIds});
-                axios.post(`http://127.0.0.1:${HTTP_PORT}/api/iota-to-ethereum-notarization.chain`,
-                  {data: msg}).then(function(data) {
+                axios.post(notarizationUrl("iota"), {data: msg})
+                  .then(function(data) {
                     L.info(`IOTA_NOTARIZE ${data.data.txid}`);
                   }).catch(function(e) {
                     L.warn(`IOTA_NOTARIZE_ERROR ${e}`)

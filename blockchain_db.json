@@ -2,18 +2,18 @@
   "subscriptions": {
     "fabchain": {
       "type": "ethereum",
-      "http": "http://78.47.38.223:8545",
-      "ws": "ws://78.47.38.223:8546"
+      "api": "http://78.47.38.223:8545",
+      "sub": "ws://78.47.38.223:8546"
     },
     "sawroom": {
       "type": "sawtooth",
-      "http": "http://195.201.42.48:8008",
-      "ws": "ws://195.201.42.48:8008/subscriptions"
+      "api": "http://195.201.42.48:8008",
+      "sub": "ws://195.201.42.48:8008/subscriptions"
     },
     "iota_devnet": {
       "type": "iota",
-      "http": "https://api.lb-0.h.chrysalis-devnet.iota.cafe/",
-      "mqtt": "mqtt://mqtt.lb-0.h.chrysalis-devnet.iota.cafe:1883"
+      "api": "https://api.lb-0.h.chrysalis-devnet.iota.cafe/",
+      "sub": "mqtt://mqtt.lb-0.h.chrysalis-devnet.iota.cafe:1883"
     }
   }
 }

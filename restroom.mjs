@@ -117,30 +117,41 @@ const startL1Watcher = () => {
   });
 }
 
+const deannounce = (identity) => {
+  axios.post(DEANNOUNCE_URL, identity)
+    .then( res => {
+      L.info("GRACEFULL_SHOTDOWN");
+      process.exit(0);
+    })
+    .catch( e => {
+      console.log(e.response);
+      L.warn("DEANNOUNE_FAILED");
+      process.exit(0);
+    });
+}
+
 /*
  * Post announce message to Issuer
  */
 const announce = (identity) => {
+  const dataIdentity = { "data" : { identity }};
   const data = {
     "add-identity": ANNOUNCE_URL,
-    "post": {
-      "data": {
-        "identity": identity
-      }
-    }
+    "post": dataIdentity
   }
-
   axios
     .post(`http://127.0.0.1:${HTTP_PORT}/api/zenswarm-oracle-announce`, {"data": data})
     .then( res => {
+      process.on('SIGINT', () => deannounce(dataIdentity));
       console.log(JSON.stringify(res.data))
       //startL1Watcher();
       dispatchSubscriptions();
     })
     .catch( e => {
+      console.log(e);
       console.error("Error in announce contract");
       process.exit(-1);
-    })
+    });
 };
 
 /*
@@ -251,6 +262,7 @@ const FILES_DIR = process.env.FILES_DIR || "contracts";
 const REGION = process.env.REGION || "NONE";
 const SUBSCRIPTIONS = process.env.SUBSCRIPTIONS || "";
 const ANNOUNCE_URL = process.env.ANNOUNCE_URL || "https://apiroom.net/api/zenswarm/zenswarm-issuer-add-identity.chain";
+const DEANNOUNCE_URL = process.env.DEANNOUNCE_URL || "https://apiroom.net/api/zenswarm/zenswarm-issuer-remove-identity"
 const L0_DEST = process.env.L0_DEST || "planetmint";
 
 const app = express();
@@ -344,13 +356,13 @@ function subscribeEth(blockchain) {
       const processMsg = function(event) {
         let msg = JSON.parse(event.data)
         if(msg.method == "eth_subscription"
-          && msg.params && msg.params.subscription == subscriptionId) {
+           && msg.params && msg.params.subscription == subscriptionId) {
           const block = msg.params.result;
           msg['endpoint'] = blockchain.api;
           Object.assign(msg, {blockchain})
           L.info("ETH_NEW_HEAD " + block.hash);
           axios.post(notarizationUrl("ethereum"), {data: msg})
-           .then(function(data) {
+            .then(function(data) {
               L.info(`ETH_NOTARIZE ${data.data.txid}`);
             }).catch(function(e) {
               L.warn(`ETH_NOTARIZE_ERROR ${e}`)
@@ -432,7 +444,8 @@ function subscribeIota(blockchain) {
               .then(function(res) {
                 Object.assign(msg, {parentMessageIds: res.data.data.parentMessageIds});
                 axios.post(notarizationUrl("iota"), {data: msg})
-                  .then(function(data) {
+                      .then(function(data) {
+                          console.log(data.data);
                     L.info(`IOTA_NOTARIZE ${data.data.txid}`);
                   }).catch(function(e) {
                     L.warn(`IOTA_NOTARIZE_ERROR ${e}`)

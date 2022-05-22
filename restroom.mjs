@@ -11,12 +11,11 @@ import rrhttp from "@restroom-mw/http";
 import rrredis from "@restroom-mw/redis";
 import sawroom from "@restroom-mw/sawroom";
 import ethereum from "@restroom-mw/ethereum";
+import planetmintmw from "@restroom-mw/planetmint";
 import timestamp from "@restroom-mw/timestamp";
 import files from "@restroom-mw/files";
 import ui from "@restroom-mw/ui";
-import {
-    zencode_exec
-} from "zenroom"
+import { zencode_exec } from "zenroom"
 import mqtt from "mqtt"
 
 import http from "http";
@@ -309,6 +308,7 @@ app.use(rrhttp.default);
 app.use(rrredis.default);
 app.use(sawroom.default);
 app.use(ethereum.default);
+app.use(planetmintmw.default);
 app.use(timestamp.default);
 app.use(files.default);
 if (OPENAPI) {

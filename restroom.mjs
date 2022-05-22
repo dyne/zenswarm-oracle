@@ -1,4 +1,8 @@
 import fs from 'fs';
+import {
+    promises as fsp
+} from 'fs';
+
 import path from 'path'
 import readdirp from 'readdirp';
 import express from "express";
@@ -15,7 +19,9 @@ import planetmintmw from "@restroom-mw/planetmint";
 import timestamp from "@restroom-mw/timestamp";
 import files from "@restroom-mw/files";
 import ui from "@restroom-mw/ui";
-import { zencode_exec } from "zenroom"
+import {
+    zencode_exec
+} from "zenroom"
 import mqtt from "mqtt"
 
 import http from "http";
@@ -172,8 +178,7 @@ const announce = (identity) => {
  */
 const saveVMLetStatus = async () => {
     // generate private keys
-    const generatePrivateKeysScript = fs.readFileSync(path.join(PRIVATE_ZENCODE_DIR,
-        "consensus-generate-all-private-keys.zen"), 'utf8')
+    const generatePrivateKeysScript = await fsp.readFile(path.join(PRIVATE_ZENCODE_DIR, "consensus-generate-all-private-keys.zen"), 'utf8')
     let keyring = {
         "ed25519_keypair": {
             "private_key": "5Jgk9ARKbPXRwPCuVHv94M4q9iKpF67Apk6hP3rRLtby",
@@ -182,14 +187,15 @@ const saveVMLetStatus = async () => {
     };
     const keys = await zen(generatePrivateKeysScript, null, null);
     if (!keys) {
+        console.error("Error in generate private keys");
         process.exit(-1)
     }
     Object.assign(keyring, JSON.parse(keys.result))
 
-    fs.writeFileSync(
+    await fsp.writeFile(
         path.join(ZENCODE_DIR, "zenswarm-oracle-generate-all-public-keys.keys"),
         keys.result)
-    fs.writeFileSync(
+    await fsp.writeFileSync(
         path.join(ZENCODE_DIR, "keyring.json"),
         JSON.stringify(keyring))
 
@@ -219,8 +225,8 @@ const saveVMLetStatus = async () => {
                 "region": REGION,
                 "country": `${COUNTRY}`
             }
-            Object.assign(identity, res.data)
-            fs.writeFileSync(
+            Object.assign(identity, await res.data)
+            await fsp.writeFile(
                 path.join(ZENCODE_DIR, "identity.json"),
                 JSON.stringify({
                     "identity": identity

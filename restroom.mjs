@@ -404,7 +404,7 @@ function subscribeEth(blockchain) {
                             data: msg
                         })
                         .then(function (data) {
-                            L.info(`ETH_NOTARIZE ${data.data.txid}`);
+                            L.info(`ETH_NOTARIZE ${data.data.txid || data.data.txId}`);
                         }).catch(function (e) {
                             L.warn(`ETH_NOTARIZE_ERROR ${e}`)
                         });

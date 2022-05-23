@@ -195,7 +195,7 @@ const saveVMLetStatus = async () => {
     await fsp.writeFile(
         path.join(ZENCODE_DIR, "zenswarm-oracle-generate-all-public-keys.keys"),
         keys.result)
-    await fsp.writeFileSync(
+    await fsp.writeFile(
         path.join(ZENCODE_DIR, "keyring.json"),
         JSON.stringify(keyring))
 
@@ -226,7 +226,7 @@ const saveVMLetStatus = async () => {
                 "country": `${COUNTRY}`
             }
             Object.assign(identity, await res.data)
-            await fsp.writeFile(
+            fs.writeFileSync(
                 path.join(ZENCODE_DIR, "identity.json"),
                 JSON.stringify({
                     "identity": identity

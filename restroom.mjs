@@ -225,7 +225,7 @@ const saveVMLetStatus = async () => {
                 "region": REGION,
                 "country": `${COUNTRY}`
             }
-            Object.assign(identity, await res.data)
+            Object.assign(identity, res.data)
             fs.writeFileSync(
                 path.join(ZENCODE_DIR, "identity.json"),
                 JSON.stringify({

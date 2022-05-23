@@ -450,7 +450,7 @@ function subscribeSaw(blockchain) {
                             data: msg
                         })
                         .then(function (data) {
-                            L.info(`SAW_NOTARIZE ${data.data.txid}`);
+                            L.info(`SAW_NOTARIZE ${data.data.txid || data.data.txId}`);
                         }).catch(function (e) {
                             L.warn(`SAW_NOTARIZE_ERROR ${e}`)
                         });
@@ -496,8 +496,7 @@ function subscribeIota(blockchain) {
                                         data: msg
                                     })
                                     .then(function (data) {
-                                        console.log(data.data);
-                                        L.info(`IOTA_NOTARIZE ${data.data.txid}`);
+                                        L.info(`IOTA_NOTARIZE ${data.data.txid || data.data.txId}`);
                                     }).catch(function (e) {
                                         L.warn(`IOTA_NOTARIZE_ERROR ${e}`)
                                     });

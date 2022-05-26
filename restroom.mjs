@@ -223,7 +223,8 @@ const saveVMLetStatus = async () => {
                 "get-identityAPI": "/api/zenswarm-oracle-get-identity",
                 "type": "restroom-mw",
                 "region": REGION,
-                "country": `${COUNTRY}`
+                "country": `${COUNTRY}`,
+                "L0": L0_DEST
             }
             Object.assign(identity, res.data)
             fs.writeFileSync(
@@ -452,6 +453,7 @@ function subscribeSaw(blockchain) {
                         .then(function (data) {
                             L.info(`SAW_NOTARIZE ${data.data.txid || data.data.txId}`);
                         }).catch(function (e) {
+                          console.log(e.response)
                             L.warn(`SAW_NOTARIZE_ERROR ${e}`)
                         });
                 } catch (e) {

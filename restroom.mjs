@@ -180,12 +180,7 @@ const announce = (identity) => {
 const saveVMLetStatus = async () => {
     // generate private keys
     const generatePrivateKeysScript = await fsp.readFile(path.join(PRIVATE_ZENCODE_DIR, "consensus-generate-all-private-keys.zen"), 'utf8')
-    let keyring = {
-        "ed25519_keypair": {
-            "private_key": "5Jgk9ARKbPXRwPCuVHv94M4q9iKpF67Apk6hP3rRLtby",
-            "public_key": "Mx2D1WbAdREJphfuAcRCge54zMndKfmozynzRZYP5aw"
-        }
-    };
+    let keyring = {}
     const keys = await zen(generatePrivateKeysScript, null, null);
     if (!keys) {
         console.error("Error in generate private keys");

@@ -200,23 +200,25 @@ const saveVMLetStatus = async () => {
         .get(`http://127.0.0.1:${HTTP_PORT}/api/zenswarm-oracle-generate-all-public-keys`)
         .then(res => {
             // put all togheter in the identity
-            const identity = {
+                  const identity = {
+		"API": [
+			"/api/zenswarm-oracle-announce",
+			"/api/ethereum-to-ethereum-notarization.chain",
+			"/api/zenswarm-oracle-get-identity",
+			"/api/zenswarm-oracle-http-post",
+			"/api/zenswarm-oracle-key-issuance.chain",
+			"/api/zenswarm-oracle-ping.zen",
+			"/api/sawroom-to-ethereum-notarization.chain",
+			"/api/zenswarm-oracle-get-timestamp.zen",
+			"/api/zenswarm-oracle-update"
+		],
                 "uid": `${HOST}:${HTTP_PORT}`,
                 "ip": HOST,
                 "baseUrl": `http://${HOST}`,
                 "port_http": `${HTTP_PORT}`,
                 "port_https": `${HTTPS_PORT}`,
                 "version": "2",
-                "announceAPI": "/api/zenswarm-oracle-announce",
-                "timestampAPI": "/api/zenswarm-oracle-get-timestamp.zen",
-                "updateAPI": "/api/zenswarm-oracle-update",
-                "http-postAPI": "/api/zenswarm-oracle-http-post",
-                "pingAPI": "/api/zenswarm-oracle-ping.zen",
-                "oracle-key-issuance": "/api/zenswarm-oracle-key-issuance.chain",
                 "tracker": "https://apiroom.net/",
-                "ethereum-notarizationAPI": "/api/ethereum-to-ethereum-notarization.chain",
-                "sawroom-notarizationAPI": "/api/sawroom-to-ethereum-notarization.chain",
-                "get-identityAPI": "/api/zenswarm-oracle-get-identity",
                 "type": "restroom-mw",
                 "region": REGION,
                 "country": `${COUNTRY}`,

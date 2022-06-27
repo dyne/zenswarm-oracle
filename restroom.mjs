@@ -48,6 +48,31 @@ const L = new winston.createLogger({
 });
 const MIN_PORT = 25000;
 const MAX_PORT = 30000;
+
+
+let HTTP_PORT = parseInt(process.env.HTTP_PORT, 10) || 0;
+let HTTPS_PORT = parseInt(process.env.HTTPS_PORT, 10) || 0;
+const HOST = process.env.HOST || "0.0.0.0";
+const COUNTRY = process.env.COUNTRY || "NONE";
+const ZENCODE_DIR = process.env.ZENCODE_DIR;
+const PRIVATE_ZENCODE_DIR = process.env.PRIVATE_ZENCODE_DIR;
+const OPENAPI = JSON.parse(process.env.OPENAPI || true);
+const L1NODES = process.env.L1NODES || "L1.yaml";
+const FILES_DIR = process.env.FILES_DIR || "contracts";
+const REGION = process.env.REGION || "NONE";
+const SUBSCRIPTIONS = process.env.SUBSCRIPTIONS || "";
+const ANNOUNCE_URL = process.env.ANNOUNCE_URL || "https://apiroom.net/api/zenswarm/zenswarm-issuer-add-identity.chain";
+const DEANNOUNCE_URL = process.env.DEANNOUNCE_URL || "https://apiroom.net/api/zenswarm/zenswarm-issuer-remove-identity"
+const L0_DEST = process.env.L0_DEST || "planetmint";
+
+
+const TLS_KEY = process.env.TLS_KEY ? fs.readFileSync(process.env.TLS_KEY) : null;
+const TLS_CRT = process.env.TLS_CRT ? fs.readFileSync(process.env.TLS_CRT) : null;
+const TLS_OPTIONS = {
+	key: TLS_KEY,
+	cert: TLS_CRT,
+}
+
 /*
  * Load current L1 blockchains database
  */
@@ -276,28 +301,6 @@ function startHttp(initial_port, callback, options) {
     return port
 }
 
-let HTTP_PORT = parseInt(process.env.HTTP_PORT, 10) || 0;
-let HTTPS_PORT = parseInt(process.env.HTTPS_PORT, 10) || 0;
-const HOST = process.env.HOST || "0.0.0.0";
-const COUNTRY = process.env.COUNTRY || "NONE";
-const ZENCODE_DIR = process.env.ZENCODE_DIR;
-const PRIVATE_ZENCODE_DIR = process.env.PRIVATE_ZENCODE_DIR;
-const OPENAPI = JSON.parse(process.env.OPENAPI || true);
-const L1NODES = process.env.L1NODES || "L1.yaml";
-const FILES_DIR = process.env.FILES_DIR || "contracts";
-const REGION = process.env.REGION || "NONE";
-const SUBSCRIPTIONS = process.env.SUBSCRIPTIONS || "";
-const ANNOUNCE_URL = process.env.ANNOUNCE_URL || "https://apiroom.net/api/zenswarm/zenswarm-issuer-add-identity.chain";
-const DEANNOUNCE_URL = process.env.DEANNOUNCE_URL || "https://apiroom.net/api/zenswarm/zenswarm-issuer-remove-identity"
-const L0_DEST = process.env.L0_DEST || "planetmint";
-
-
-const TLS_KEY = process.env.TLS_KEY ? fs.readFileSync(process.env.TLS_KEY) : null;
-const TLS_CRT = process.env.TLS_CRT ? fs.readFileSync(process.env.TLS_CRT) : null;
-const TLS_OPTIONS = {
-	key: TLS_KEY,
-	cert: TLS_CRT,
-}
 const app = express();
 
 app.use(bodyParser.urlencoded({

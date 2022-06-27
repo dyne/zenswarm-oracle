@@ -59,9 +59,9 @@ const PRIVATE_ZENCODE_DIR = process.env.PRIVATE_ZENCODE_DIR;
 const OPENAPI = JSON.parse(process.env.OPENAPI || true);
 const L1NODES = process.env.L1NODES || "L1.yaml";
 const FILES_DIR = process.env.FILES_DIR || "contracts";
-const REGION = process.env.REGION || "NONE";
+const STATE = process.env.STATE || "NONE";
 const SUBSCRIPTIONS = process.env.SUBSCRIPTIONS || "";
-const ANNOUNCE_URL = process.env.ANNOUNCE_URL || "https://apiroom.net/api/zenswarm/zenswarm-issuer-add-identity.chain";
+const ANNOUNCE_URL = process.env.ANNOUNCE_URL || "https://apiroom.net/api/zenswarm/W3C-DID-controller-create-DID.chain";
 const DEANNOUNCE_URL = process.env.DEANNOUNCE_URL || "https://apiroom.net/api/zenswarm/zenswarm-issuer-remove-identity"
 const L0_DEST = process.env.L0_DEST || "planetmint";
 
@@ -244,9 +244,9 @@ const saveVMLetStatus = async () => {
                 "port_https": `${HTTPS_PORT}`,
                 "version": "2",
                 "tracker": "https://apiroom.net/",
-                "type": "restroom-mw",
-                "region": REGION,
-                "country": `${COUNTRY}`,
+                "description": "restroom-mw",
+                "State": STATE,
+                "Country": `${COUNTRY}`,
                 "L0": L0_DEST
             }
             Object.assign(identity, res.data)

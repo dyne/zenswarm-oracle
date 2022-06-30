@@ -1,7 +1,4 @@
 import fs from 'fs';
-import {
-    promises as fsp
-} from 'fs';
 
 import path from 'path'
 import readdirp from 'readdirp';
@@ -19,19 +16,13 @@ import planetmintmw from "@restroom-mw/planetmint";
 import timestamp from "@restroom-mw/timestamp";
 import files from "@restroom-mw/files";
 import ui from "@restroom-mw/ui";
-import {
-    zencode_exec
-} from "zenroom"
 import mqtt from "mqtt"
 
 import http from "http";
-import https from "https";
 import morgan from "morgan";
 import winston from "winston";
 import dotenv from "dotenv";
 import axios from 'axios';
-import chokidar from 'chokidar';
-import yaml from 'js-yaml';
 import WebSocket from 'ws';
 import readLastLines from 'read-last-lines';
 
@@ -46,32 +37,19 @@ const L = new winston.createLogger({
     ],
     exitOnError: false
 });
-const MIN_PORT = 25000;
-const MAX_PORT = 30000;
 
-
-let HTTP_PORT = parseInt(process.env.HTTP_PORT, 10) || 0;
-let HTTPS_PORT = parseInt(process.env.HTTPS_PORT, 10) || 0;
+const EXT_PORT = parseInt(process.env.EXT_PORT || "8000", 10);
+const INT_PORT = parseInt(process.env.INT_PORT || "3000", 10);
 const HOST = process.env.HOST || "0.0.0.0";
 const COUNTRY = process.env.COUNTRY || "NONE";
-const ZENCODE_DIR = process.env.ZENCODE_DIR;
-const PRIVATE_ZENCODE_DIR = process.env.PRIVATE_ZENCODE_DIR;
+const ZENCODE_DIR = process.env.ZENCODE_DIR || "contracts";
 const OPENAPI = JSON.parse(process.env.OPENAPI || true);
-const L1NODES = process.env.L1NODES || "L1.yaml";
-const FILES_DIR = process.env.FILES_DIR || "contracts";
 const STATE = process.env.STATE || "NONE";
 const SUBSCRIPTIONS = process.env.SUBSCRIPTIONS || "";
-const ANNOUNCE_URL = process.env.ANNOUNCE_URL || "https://apiroom.net/api/zenswarm/W3C-DID-controller-create-DID.chain";
-const DEANNOUNCE_URL = process.env.DEANNOUNCE_URL || "https://apiroom.net/api/zenswarm/zenswarm-issuer-remove-identity"
+const ANNOUNCE_URL = process.env.ANNOUNCE_URL || "";
+const DEANNOUNCE_URL = process.env.DEANNOUNCE_URL || ""
 const L0_DEST = process.env.L0_DEST || "planetmint";
 
-
-const TLS_KEY = process.env.TLS_KEY ? fs.readFileSync(process.env.TLS_KEY) : null;
-const TLS_CRT = process.env.TLS_CRT ? fs.readFileSync(process.env.TLS_CRT) : null;
-const TLS_OPTIONS = {
-	key: TLS_KEY,
-	cert: TLS_CRT,
-}
 
 /*
  * Load current L1 blockchains database
@@ -87,161 +65,79 @@ const blockchainDB = JSON.parse(
 ).subscriptions;
 Object.keys(blockchainDB).forEach(key => blockchainDB[key].name = key);
 
-/*
- * Run a zenroom script (outside restroom mw)
- */
-const zen = async (zencode, keys, data) => {
-    const params = {};
-    if (keys !== undefined && keys !== null) {
-        params.keys = typeof keys === 'string' ? keys : JSON.stringify(keys);
-    }
-    if (data !== undefined && data !== null) {
-        params.data = typeof data === 'string' ? data : JSON.stringify(data);
-    }
-    try {
-        return await zencode_exec(zencode, params);
-    } catch (e) {
-        console.log("Error from zencode_exec: ", e);
-    }
-}
-
-/*
- * Monitor file with L1 data to be monitored
- */
-const intervalIDs = []
-
-const startL1Cron = (path) => {
-    // clean all intervals
-    while (intervalIDs.length > 0) {
-        clearInterval(intervalIDs.pop())
-    }
-
-    fs.readFile(path, (err, data) => {
-        if (err) {
-            console.error("Could not read L1 nodes");
-            return;
-        }
-        //start the new ones as in the file
-        data = yaml.load(data);
-        console.log(`UPDATE_L1_LIST ${Date.now()}`)
-        if (!data) {
-            console.log("Could not read YAML")
-            return;
-        }
-
-        Object.keys(data.ledgers).forEach((key) => {
-            const ledger = data.ledgers[key];
-            const fnLogger = msg => console.log(`POLLING ${key} ${Date.now()} ${msg}`)
-            if (ledger.interval > 0) {
-                intervalIDs.push(setInterval(() => {
-                    axios
-                        .post(`http://127.0.0.1:${HTTP_PORT}/api/${ledger.contract}`)
-                        .then(res => {
-                            fnLogger(JSON.stringify(res.data))
-                        })
-                        .catch(err => {
-                            fnLogger(JSON.stringify(err))
-                        })
-                }, ledger.interval * 1000))
-            }
-        })
-    });
-}
-
-const startL1Watcher = () => {
-    const file = path.join(FILES_DIR, L1NODES);
-    //startL1Cron(file);
-    chokidar.watch(file).on('all', (_, path) => {
-        startL1Cron(path);
-    });
-}
-
 const deannounce = (identity) => {
-    axios.post(DEANNOUNCE_URL, identity)
-        .then(res => {
-            L.info("GRACEFUL_SHUTDOWN");
-            process.exit(0);
-        })
-        .catch(e => {
-            console.log(e.response);
-            L.warn("DEANNOUNE_FAILED");
-            process.exit(0);
-        });
+    if(ANNOUNCE_URL && DEANNOUNCE_URL) {
+        axios.post(DEANNOUNCE_URL, identity)
+            .then(res => {
+                L.info("GRACEFUL_SHUTDOWN");
+                process.exit(0);
+            })
+            .catch(e => {
+                console.log(e.response);
+                L.warn("DEANNOUNE_FAILED");
+                process.exit(0);
+            });
+    }
 }
 
 /*
  * Post announce message to Issuer
  */
 const announce = (identity) => {
-    const dataIdentity = {
-        "data": {
-            identity
+    if(ANNOUNCE_URL) {
+        const dataIdentity = {
+            "data": {
+                identity
+            }
+        };
+        const data = {
+            "add-identity": ANNOUNCE_URL,
+            "post": dataIdentity
         }
-    };
-    const data = {
-        "add-identity": ANNOUNCE_URL,
-        "post": dataIdentity
+        axios
+            .post(`http://127.0.0.1:${INT_PORT}/api/zenswarm-oracle-announce`, {
+                "data": data
+            })
+            .then(res => {
+                process.on('SIGINT', () => deannounce(dataIdentity));
+                console.log(JSON.stringify(res.data))
+                dispatchSubscriptions();
+            })
+            .catch(e => {
+                console.log(e);
+                console.error("Error in announce contract");
+                process.exit(-1);
+            });
+    } else {
+        dispatchSubscriptions()
     }
-    axios
-        .post(`http://127.0.0.1:${HTTP_PORT}/api/zenswarm-oracle-announce`, {
-            "data": data
-        })
-        .then(res => {
-            process.on('SIGINT', () => deannounce(dataIdentity));
-            console.log(JSON.stringify(res.data))
-            //startL1Watcher();
-            dispatchSubscriptions();
-        })
-        .catch(e => {
-            console.log(e);
-            console.error("Error in announce contract");
-            process.exit(-1);
-        });
 };
 
 /*
  * Create VMLet identity
  */
 const saveVMLetStatus = async () => {
-    // generate private keys
-    const generatePrivateKeysScript = await fsp.readFile(path.join(PRIVATE_ZENCODE_DIR, "consensus-generate-all-private-keys.zen"), 'utf8')
-    let keyring = {}
-    const keys = await zen(generatePrivateKeysScript, null, null);
-    if (!keys) {
-        console.error("Error in generate private keys");
-        process.exit(-1)
-    }
-    Object.assign(keyring, JSON.parse(keys.result))
-
-    await fsp.writeFile(
-        path.join(ZENCODE_DIR, "zenswarm-oracle-generate-all-public-keys.keys"),
-        keys.result)
-    await fsp.writeFile(
-        path.join(ZENCODE_DIR, "keyring.json"),
-        JSON.stringify(keyring))
-
     // generate relative public keys
     axios
-        .get(`http://127.0.0.1:${HTTP_PORT}/api/zenswarm-oracle-generate-all-public-keys`)
+        .get(`http://127.0.0.1:${INT_PORT}/api/zenswarm-oracle-generate-all-public-keys`)
         .then(res => {
             // put all togheter in the identity
-                  const identity = {
-		"API": [
-			"/api/zenswarm-oracle-announce",
-			"/api/ethereum-to-ethereum-notarization.chain",
-			"/api/zenswarm-oracle-get-identity",
-			"/api/zenswarm-oracle-http-post",
-			"/api/zenswarm-oracle-key-issuance.chain",
-			"/api/zenswarm-oracle-ping.zen",
-			"/api/sawroom-to-ethereum-notarization.chain",
-			"/api/zenswarm-oracle-get-timestamp.zen",
-			"/api/zenswarm-oracle-update"
-		],
-                "uid": `${HOST}:${HTTP_PORT}`,
+            const identity = {
+                "API": [
+                    "/api/zenswarm-oracle-announce",
+                    "/api/ethereum-to-ethereum-notarization.chain",
+                    "/api/zenswarm-oracle-get-identity",
+                    "/api/zenswarm-oracle-http-post",
+                    "/api/zenswarm-oracle-key-issuance.chain",
+                    "/api/zenswarm-oracle-ping.zen",
+                    "/api/sawroom-to-ethereum-notarization.chain",
+                    "/api/zenswarm-oracle-get-timestamp.zen",
+                    "/api/zenswarm-oracle-update"
+                ],
+                "uid": `${HOST}:${EXT_PORT}`,
                 "ip": HOST,
-                "baseUrl": `http://${HOST}`,
-                "port_http": `${HTTP_PORT}`,
-                "port_https": `${HTTPS_PORT}`,
+                "baseUrl": `https://${HOST}`,
+                "port_https": `${EXT_PORT}`,
                 "version": "2",
                 "tracker": "https://apiroom.net/",
                 "description": "restroom-mw",
@@ -263,42 +159,6 @@ const saveVMLetStatus = async () => {
             console.error(e)
             process.exit(-1);
         })
-}
-
-/*
- * Utils: generate a random number between min and max
- */
-function between(min, max) {
-    return Math.floor(
-        Math.random() * (max - min) + min
-    )
-}
-
-function startHttp(initial_port, callback, options) {
-    let port = initial_port;
-    const httpServer = options ? https.createServer(options, app)
-		               : http.createServer(app);
-    let retry = 1000;
-    if (port <= 0) port = between(MIN_PORT, MAX_PORT);
-    console.log(`CHOSEN_HTTP_PORT ${port}`)
-    httpServer.listen(port, function () {
-        console.log(`LISTENING ${httpServer.address().port}`);
-        callback();
-    }).on('error', function (err) {
-        console.log(`ERROR ${err.code}`)
-        if (err.code == 'EADDRINUSE') {
-            port = between(MIN_PORT, MAX_PORT);
-            console.log(`CHOSEN_HTTP_PORT ${port}`)
-            if (retry-- > 0)
-                httpServer.listen(port);
-            else
-                throw new Error("Could not find a free port")
-        } else {
-            console.log(err);
-            process.exit(-1);
-        }
-    });
-    return port
 }
 
 const app = express();
@@ -352,13 +212,12 @@ const contracts = fs.readdirSync(ZENCODE_DIR);
 
 if (contracts.length > 0) {
     const httpStarted = async () => {
-        process.env.HTTPS_PORT = HTTPS_PORT;
         await saveVMLetStatus();
-        console.log(`🚻 Restroom started on ${HTTP_PORT} (http) and ${HTTPS_PORT} (https)`);
+        console.log(`🚻 Restroom started on ${INT_PORT}`);
         console.log(`📁 the ZENCODE directory is: ${chalk.magenta.underline(ZENCODE_DIR)} \n`);
 
         if (OPENAPI) {
-            console.log(`To see the OpenApi interface head your browser to: ${chalk.bold.blue.underline('http://' + HOST + ':' + HTTP_PORT + '/docs')}`);
+            console.log(`To see the OpenApi interface head your browser to: ${chalk.bold.blue.underline('http://' + HOST + ':' + INT_PORT + '/docs')}`);
             console.log(`To disable OpenApi, run ${chalk.bold('OPENAPI=0 yarn start')}`);
         } else {
             console.log(`⚠️ The OpenApi is not enabled! NO UI IS SERVED. To enable it run run ${chalk.bold('OPENAPI=1 yarn start')}`);
@@ -372,17 +231,15 @@ if (contracts.length > 0) {
             console.log(`\t${chalk.bold.green(endpoint)}`);
         });
     }
-    HTTP_PORT = startHttp(HTTP_PORT, () => {
-        process.env.HTTP_PORT = HTTP_PORT;
-        HTTPS_PORT = startHttp(HTTPS_PORT, httpStarted, TLS_OPTIONS);
-    });
+    const server = http.createServer(app);
+    server.listen(INT_PORT, httpStarted);
 
 } else {
     console.log(`🚨 The ${chalk.magenta.underline(ZENCODE_DIR)} folder is empty, please add some ZENCODE smart contract before running Restroom`);
 }
 
 function notarizationUrl(from) {
-    return `http://127.0.0.1:${HTTP_PORT}/api/${from}-to-${L0_DEST}-notarization.chain`;
+    return `http://127.0.0.1:${INT_PORT}/api/${from}-to-${L0_DEST}-notarization.chain`;
 }
 
 /*

@@ -38,8 +38,8 @@ const L = new winston.createLogger({
     exitOnError: false
 });
 
-const EXT_PORT = parseInt(process.env.EXT_PORT || "8000", 10);
-const INT_PORT = parseInt(process.env.INT_PORT || "3000", 10);
+const HTTPS_PORT = parseInt(process.env.HTTPS_PORT || "8000", 10);
+const HTTP_PORT = parseInt(process.env.HTTP_PORT || "3000", 10);
 const HOST = process.env.HOST || "0.0.0.0";
 const COUNTRY = process.env.COUNTRY || "NONE";
 const ZENCODE_DIR = process.env.ZENCODE_DIR || "contracts";
@@ -95,7 +95,7 @@ const announce = (identity) => {
             "post": dataIdentity
         }
         axios
-            .post(`http://127.0.0.1:${INT_PORT}/api/zenswarm-oracle-announce`, {
+            .post(`http://127.0.0.1:${HTTP_PORT}/api/zenswarm-oracle-announce`, {
                 "data": data
             })
             .then(res => {
@@ -119,7 +119,7 @@ const announce = (identity) => {
 const saveVMLetStatus = async () => {
     // generate relative public keys
     axios
-        .get(`http://127.0.0.1:${INT_PORT}/api/zenswarm-oracle-generate-all-public-keys`)
+        .get(`http://127.0.0.1:${HTTP_PORT}/api/zenswarm-oracle-generate-all-public-keys`)
         .then(res => {
             // put all togheter in the identity
             const identity = {
@@ -134,10 +134,10 @@ const saveVMLetStatus = async () => {
                     "/api/zenswarm-oracle-get-timestamp.zen",
                     "/api/zenswarm-oracle-update"
                 ],
-                "uid": `${HOST}:${EXT_PORT}`,
+                "uid": `${HOST}:${HTTPS_PORT}`,
                 "ip": HOST,
                 "baseUrl": `https://${HOST}`,
-                "port_https": `${EXT_PORT}`,
+                "port_https": `${HTTPS_PORT}`,
                 "version": "2",
                 "tracker": "https://apiroom.net/",
                 "description": "restroom-mw",
@@ -213,11 +213,11 @@ const contracts = fs.readdirSync(ZENCODE_DIR);
 if (contracts.length > 0) {
     const httpStarted = async () => {
         await saveVMLetStatus();
-        console.log(`🚻 Restroom started on ${INT_PORT}`);
+        console.log(`🚻 Restroom started on ${HTTP_PORT}`);
         console.log(`📁 the ZENCODE directory is: ${chalk.magenta.underline(ZENCODE_DIR)} \n`);
 
         if (OPENAPI) {
-            console.log(`To see the OpenApi interface head your browser to: ${chalk.bold.blue.underline('http://' + HOST + ':' + INT_PORT + '/docs')}`);
+            console.log(`To see the OpenApi interface head your browser to: ${chalk.bold.blue.underline('http://' + HOST + ':' + HTTP_PORT + '/docs')}`);
             console.log(`To disable OpenApi, run ${chalk.bold('OPENAPI=0 yarn start')}`);
         } else {
             console.log(`⚠️ The OpenApi is not enabled! NO UI IS SERVED. To enable it run run ${chalk.bold('OPENAPI=1 yarn start')}`);
@@ -232,14 +232,14 @@ if (contracts.length > 0) {
         });
     }
     const server = http.createServer(app);
-    server.listen(INT_PORT, httpStarted);
+    server.listen(HTTP_PORT, httpStarted);
 
 } else {
     console.log(`🚨 The ${chalk.magenta.underline(ZENCODE_DIR)} folder is empty, please add some ZENCODE smart contract before running Restroom`);
 }
 
 function notarizationUrl(from) {
-    return `http://127.0.0.1:${INT_PORT}/api/${from}-to-${L0_DEST}-notarization.chain`;
+    return `http://127.0.0.1:${HTTP_PORT}/api/${from}-to-${L0_DEST}-notarization.chain`;
 }
 
 /*

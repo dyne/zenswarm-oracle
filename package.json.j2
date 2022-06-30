@@ -1,9 +1,10 @@
 {
-    "name": "restroom-vmlet-template",
+    "name": "{{ vmlet_name }}",
     "version": "0.1.0",
     "private": true,
     "scripts": {
-        "start": "ZENCODE_DIR=contracts node restroom.mjs"
+        "start": "node restroom.mjs",
+        "init": "node init.mjs"
     },
     "dependencies": {
         "@dyne/sawroom-client": "^1.9.0",

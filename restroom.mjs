@@ -189,7 +189,8 @@ app.use(timestamp.default);
 app.use(files.default);
 if (OPENAPI) {
     app.use("/docs", ui.default({
-        path: ZENCODE_DIR
+        path: ZENCODE_DIR,
+        isDataPublic: true,
     }));
 }
 

@@ -136,7 +136,8 @@ const saveVMLetStatus = async () => {
                     "/api/zenswarm-oracle-get-signed-timestamp",
                     "/api/zenswarm-oracle-sign-dilithium",
                     "/api/zenswarm-oracle-sign-ecdsa",
-                    "/api/zenswarm-oracle-sign-eddsa"
+                    "/api/zenswarm-oracle-sign-eddsa",
+                    "/api/zenswarm-oracle-sign-schnorr"             
                 ],
                 "uid": `${HOST}:${HTTPS_PORT}`,
                 "ip": HOST,

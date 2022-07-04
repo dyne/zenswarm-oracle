@@ -129,10 +129,14 @@ const saveVMLetStatus = async () => {
                     "/api/zenswarm-oracle-get-identity",
                     "/api/zenswarm-oracle-http-post",
                     "/api/zenswarm-oracle-key-issuance.chain",
-                    "/api/zenswarm-oracle-ping.zen",
+                    "/api/zenswarm-oracle-ping",
                     "/api/sawroom-to-ethereum-notarization.chain",
-                    "/api/zenswarm-oracle-get-timestamp.zen",
-                    "/api/zenswarm-oracle-update"
+                    "/api/zenswarm-oracle-get-timestamp",
+                    "/api/zenswarm-oracle-update",
+                    "/api/zenswarm-oracle-get-signed-timestamp",
+                    "/api/zenswarm-oracle-sign-dilithium",
+                    "/api/zenswarm-oracle-sign-ecdsa",
+                    "/api/zenswarm-oracle-sign-eddsa"
                 ],
                 "uid": `${HOST}:${HTTPS_PORT}`,
                 "ip": HOST,

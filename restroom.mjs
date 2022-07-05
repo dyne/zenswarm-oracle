@@ -137,7 +137,9 @@ const saveVMLetStatus = async () => {
                     "/api/zenswarm-oracle-sign-dilithium",
                     "/api/zenswarm-oracle-sign-ecdsa",
                     "/api/zenswarm-oracle-sign-eddsa",
-                    "/api/zenswarm-oracle-sign-schnorr"             
+                    "/api/zenswarm-oracle-sign-schnorr",
+                    "/api/zenswarm-dilithium-signature-verification-on-planetmint.chain",
+                    "/api/zenswarm-oracle-execute-zencode-planetmint.chain"
                 ],
                 "uid": `${HOST}:${HTTPS_PORT}`,
                 "ip": HOST,

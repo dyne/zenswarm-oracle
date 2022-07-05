@@ -39,9 +39,12 @@ if (!keys) {
 }
 Object.assign(keyring, JSON.parse(keys.result))
 
+try {
+    await fsp.unlink(path.join(ZENCODE_DIR, "zenswarm-oracle-generate-all-public-keys.keys"))
+} catch(e) {}
 await fsp.writeFile(
     path.join(ZENCODE_DIR, "zenswarm-oracle-generate-all-public-keys.keys"),
-    keys.result)
+    keys.result, {mode: 0o600})
 // Delete keyring if it exists (writing a file that exist
 // doesn't change the permissions)
 try {

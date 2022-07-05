@@ -44,7 +44,7 @@ await fsp.writeFile(
     keys.result)
 await fsp.writeFile(
     path.join(ZENCODE_DIR, "keyring.json"),
-    JSON.stringify(keyring))
+    JSON.stringify(keyring), {mode: 0o600})
 try {
     await fsp.unlink(path.join(ZENCODE_DIR, "identity.json"))
 } catch(e) {}

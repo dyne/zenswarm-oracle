@@ -17,6 +17,7 @@ import timestamp from "@restroom-mw/timestamp";
 import files from "@restroom-mw/files";
 import ui from "@restroom-mw/ui";
 import mqtt from "mqtt"
+import cors from "cors"
 
 import http from "http";
 import morgan from "morgan";
@@ -171,6 +172,8 @@ const saveVMLetStatus = async () => {
 
 const app = express();
 
+// Used by the dashboard
+app.use(cors())
 app.use(bodyParser.urlencoded({
     extended: false
 }));
@@ -180,11 +183,6 @@ app.use(morgan('combined', {
 }))
 app.set("json spaces", 2);
 
-// Used by the dashboard
-app.use(function (req, res, next) {
-    res.header('Access-Control-Allow-Origin', '*');
-    next();
-});
 
 app.use(db.default);
 app.use(fabric.default);

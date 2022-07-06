@@ -141,7 +141,13 @@ const saveVMLetStatus = async () => {
                     "/api/zenswarm-oracle-sign-schnorr",
                     "/api/zenswarm-dilithium-signature-verification-on-planetmint.chain",
                     "/api/zenswarm-oracle-execute-zencode-planetmint.chain",
-                    "/api/zenswarm-post-6-rand-oracles.chain"
+                    "/api/zenswarm-post-6-rand-oracles.chain",
+                    "/api/zenswarm-read-from-fabric",
+                    "/api/zenswarm-write-on-fabric",
+                    "/api/zenswarm-read-from-ethereum",
+                    "/api/zenswarm-write-on-ethereum.chain",
+                    "/api/zenswarm-read-from-planetmint",
+                    "/api/zenswarm-write-on-planetmint"
                 ],
                 "uid": `${HOST}:${HTTPS_PORT}`,
                 "ip": HOST,

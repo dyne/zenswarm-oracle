@@ -18,6 +18,7 @@ import files from "@restroom-mw/files";
 import ui from "@restroom-mw/ui";
 import mqtt from "mqtt"
 import cors from "cors"
+import web3EthAbi from "web3-eth-abi"
 
 import http from "http";
 import morgan from "morgan";
@@ -50,6 +51,7 @@ const SUBSCRIPTIONS = process.env.SUBSCRIPTIONS || "";
 const ANNOUNCE_URL = process.env.ANNOUNCE_URL || "";
 const DEANNOUNCE_URL = process.env.DEANNOUNCE_URL || ""
 const L0_DEST = process.env.L0_DEST || "planetmint";
+const ETH2PLNT = process.env.ETH2PLNT || "";
 
 
 /*
@@ -103,6 +105,7 @@ const announce = (identity) => {
                 process.on('SIGINT', () => deannounce(dataIdentity));
                 console.log(JSON.stringify(res.data))
                 dispatchSubscriptions();
+                subscribeEth2Plt();
             })
             .catch(e => {
                 console.log(e);
@@ -111,6 +114,7 @@ const announce = (identity) => {
             });
     } else {
         dispatchSubscriptions()
+        subscribeEth2Plt();
     }
 };
 
@@ -434,5 +438,94 @@ function dispatchSubscriptions() {
         path.join(ZENCODE_DIR, "blockchain-subscriptions.json"),
         JSON.stringify({
             subscriptions
+        }));
+}
+
+
+
+// Listen to transfer from eth to planetmint
+
+function subscribeEth2Plt() {
+    let events_subscriptions = {}
+    if(ETH2PLNT != "") {
+        const [blockchain, address] = ETH2PLNT.split(" ")
+
+        try {
+            const ws = new WebSocket(blockchainDB[blockchain].sub);
+            ws.onopen = function () {
+                const id = Math.floor(Math.random() * 65536);
+                let subscriptionId = null;
+
+                const params = JSON.stringify({
+                    jsonrpc:  "2.0",
+                    id,
+                    method:  "eth_subscribe",
+                    params:  ["logs",  {
+                        address,
+                        topics:  ["0xe1ba5a54ca8f489003348eb7320bf1f27b39f586af90dfeed84f70eb39f7fa65"]
+                    }]
+                });
+                ws.send(params)
+
+                const processMsg = function (event) {
+                    let msg = JSON.parse(event.data)
+                    if (msg.method == "eth_subscription" &&
+                        msg.params && msg.params.subscription == subscriptionId) {
+                        const from = web3EthAbi.decodeParameter(
+                            'address', msg.params.result.topics[1])
+                        const erc721_address = web3EthAbi.decodeParameter(
+                            'address', msg.params.result.topics[2])
+                        const erc721_id = web3EthAbi.decodeParameter(
+                            'uint256', msg.params.result.topics[3])
+                        const to = Buffer.from(
+                            web3EthAbi.decodeParameter(
+                                'bytes', msg.params.result.data)
+                            .substring(2),
+                            'hex').toString('utf-8')
+                        const planetmint_endpoint = "https://test.ipdb.io/api/v1/"
+                        const fabchain_endpoint = "http://test.fabchain.net:8545"
+                        const data = {
+                            erc721_id,
+                            to,
+                            erc721_address,
+                            planetmint_endpoint,
+                            fabchain_endpoint,
+                        }
+                        axios.post(`http://127.0.0.1:${HTTP_PORT}/api/eth2pltmnt.chain`, {data, keys: {}})
+                            .then(res => {
+                                L.info(`ETH2PLNTMNT  ${res.data.txid}`)
+                            })
+                            .catch(e => {
+                                L.error("ETH2TPLNTMNT ERROR")
+                                console.log("Error")
+                                console.log(e.response)
+                            });
+                    }
+                }
+                ws.onmessage = function (e) {
+                    const msg = JSON.parse(e.data);
+                    if (msg.result && msg.id == id) {
+                        subscriptionId = msg.result
+                        // from now on messages will be processed as blocks
+                        ws.onmessage = processMsg;
+                    }
+
+                }
+                ws.onclose = function () {
+                    Log.warn("ETH_CLOSE")
+                }
+            }
+            const desc = "transfer-nft-ethereum-to-planetmint";
+            events_subscriptions[desc] = blockchainDB[blockchain]
+            events_subscriptions[desc]["contract_address"] = address
+        } catch (e) {
+            L.error(`ETH_WS_ERROR ${e}`);
+            process.exit(-1);
+        }
+    }
+    fs.writeFileSync(
+        path.join(ZENCODE_DIR, "event-subscriptions.json"),
+        JSON.stringify({
+            events_subscriptions
         }));
 }

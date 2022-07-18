@@ -161,7 +161,7 @@ const saveVMLetStatus = async () => {
                 "ip": HOST,
                 "baseUrl": `https://${HOST}`,
                 "port_https": `${HTTPS_PORT}`,
-                "version": "2",
+                "version": "3",
                 "tracker": "https://apiroom.net/",
                 "description": "restroom-mw",
                 "State": STATE,

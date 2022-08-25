@@ -43,6 +43,7 @@ const L = new winston.createLogger({
 const HTTPS_PORT = parseInt(process.env.HTTPS_PORT || "8000", 10);
 const HTTP_PORT = parseInt(process.env.HTTP_PORT || "3000", 10);
 const HOST = process.env.HOST || "0.0.0.0";
+const EXT_HOST = process.env.EXT_HOST || `https://${HOST}`;
 const COUNTRY = process.env.COUNTRY || "NONE";
 const ZENCODE_DIR = process.env.ZENCODE_DIR || "contracts";
 const OPENAPI = JSON.parse(process.env.OPENAPI || true);
@@ -52,7 +53,6 @@ const ANNOUNCE_URL = process.env.ANNOUNCE_URL || "";
 const DEANNOUNCE_URL = process.env.DEANNOUNCE_URL || ""
 const L0_DEST = process.env.L0_DEST || "planetmint";
 const ETH2PLNT = process.env.ETH2PLNT || "";
-const PROTOCOL = process.env.PROTOCOL || "https";
 
 
 /*
@@ -160,7 +160,7 @@ const saveVMLetStatus = async () => {
                 ],
                 "uid": `${HOST}:${HTTPS_PORT}`,
                 "ip": HOST,
-                "baseUrl": `${PROTOCOL}://${HOST}`,
+                "baseUrl": EXT_HOST,
                 "port_https": `${HTTPS_PORT}`,
                 "version": "3",
                 "tracker": "https://apiroom.net/",

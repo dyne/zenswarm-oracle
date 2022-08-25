@@ -52,6 +52,7 @@ const ANNOUNCE_URL = process.env.ANNOUNCE_URL || "";
 const DEANNOUNCE_URL = process.env.DEANNOUNCE_URL || ""
 const L0_DEST = process.env.L0_DEST || "planetmint";
 const ETH2PLNT = process.env.ETH2PLNT || "";
+const PROTOCOL = process.env.PROTOCOL || "https";
 
 
 /*
@@ -159,7 +160,7 @@ const saveVMLetStatus = async () => {
                 ],
                 "uid": `${HOST}:${HTTPS_PORT}`,
                 "ip": HOST,
-                "baseUrl": `https://${HOST}`,
+                "baseUrl": `${PROTOCOL}://${HOST}`,
                 "port_https": `${HTTPS_PORT}`,
                 "version": "3",
                 "tracker": "https://apiroom.net/",

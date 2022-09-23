@@ -69,6 +69,10 @@ const blockchainDB = JSON.parse(
 ).subscriptions;
 Object.keys(blockchainDB).forEach(key => blockchainDB[key].name = key);
 
+const readContracts = () => readdirp(ZENCODE_DIR, {
+    fileFilter: '*.zen|*.yaml|*.yml'
+})
+
 const deannounce = (identity) => {
     if(ANNOUNCE_URL && DEANNOUNCE_URL) {
         axios.post(DEANNOUNCE_URL, identity)
@@ -122,7 +126,7 @@ const announce = (identity) => {
 const fsReadAPIs = async () => {
     let apis = []
     return new Promise((resolve, reject) => {
-        readdirp(ZENCODE_DIR, {fileFilter: ['*.zen', '*.yml']})
+        readContracts()
             .on('data', (entry) => {
                 apis.push(`/api/${entry.basename.substr(0, entry.basename.lastIndexOf('.'))}`)
             })
@@ -231,9 +235,7 @@ if (contracts.length > 0) {
         }
 
         console.log("\nExposing");
-        readdirp(ZENCODE_DIR, {
-            fileFilter: '*.zen|*.yaml|*.yml'
-        }).on('data', (c) => {
+        readContracts().on('data', (c) => {
             const endpoint = `/api/${c.path.replace('.zen', '')}`
             console.log(`\t${chalk.bold.green(endpoint)}`);
         });

@@ -119,45 +119,30 @@ const announce = (identity) => {
     }
 };
 
+const fsReadAPIs = async () => {
+    let apis = []
+    return new Promise((resolve, reject) => {
+        readdirp(ZENCODE_DIR, {fileFilter: ['*.zen', '*.yml']})
+            .on('data', (entry) => {
+                apis.push(`/api/${entry.basename.substr(0, entry.basename.lastIndexOf('.'))}`)
+            })
+            .on('end', () => resolve(apis))
+            .on('error', error => reject(error))
+    })
+}
+
 /*
  * Create VMLet identity
  */
 const saveVMLetStatus = async () => {
+    const apis = fsReadAPIs();
     // generate relative public keys
     axios
         .get(`http://127.0.0.1:${HTTP_PORT}/api/zenswarm-oracle-generate-all-public-keys`)
-        .then(res => {
+        .then(async (res) => {
             // put all togheter in the identity
             const identity = {
-                "API": [
-                    "/api/zenswarm-oracle-announce",
-                    "/api/ethereum-to-ethereum-notarization.chain",
-                    "/api/zenswarm-oracle-get-identity",
-                    "/api/zenswarm-oracle-http-post",
-                    "/api/zenswarm-oracle-key-issuance.chain",
-                    "/api/zenswarm-oracle-ping",
-                    "/api/sawroom-to-ethereum-notarization.chain",
-                    "/api/zenswarm-oracle-get-timestamp",
-                    "/api/zenswarm-oracle-update",
-                    "/api/zenswarm-oracle-get-signed-timestamp",
-                    "/api/zenswarm-oracle-sign-dilithium",
-                    "/api/zenswarm-oracle-sign-ecdsa",
-                    "/api/zenswarm-oracle-sign-eddsa",
-                    "/api/zenswarm-oracle-sign-schnorr",
-                    "/api/zenswarm-dilithium-signature-verification-on-planetmint.chain",
-                    "/api/zenswarm-oracle-execute-zencode-planetmint.chain",
-                    "/api/zenswarm-post-6-rand-oracles.chain",
-                    "/api/zenswarm-read-from-fabric",
-                    "/api/zenswarm-write-on-fabric",
-                    "/api/zenswarm-read-from-ethereum",
-                    "/api/zenswarm-write-on-ethereum.chain",
-                    "/api/zenswarm-read-from-planetmint",
-                    "/api/zenswarm-write-on-planetmint",
-                    "/api/zenswarm-oracle-verify-dilithium",
-                    "/api/zenswarm-oracle-verify-ecdsa",
-                    "/api/zenswarm-oracle-verify-eddsa",
-                    "/api/zenswarm-oracle-verify-schnorr"
-                ],
+                "API": await apis,
                 "uid": `${HOST}:${HTTPS_PORT}`,
                 "ip": HOST,
                 "baseUrl": EXT_HOST,

@@ -53,6 +53,7 @@ const ANNOUNCE_URL = process.env.ANNOUNCE_URL || "";
 const DEANNOUNCE_URL = process.env.DEANNOUNCE_URL || ""
 const L0_DEST = process.env.L0_DEST || "planetmint";
 const ETH2PLNT = process.env.ETH2PLNT || "";
+const DESCRIPTION = process.env.DESCRIPTION || "restroom-mw";
 
 
 /*
@@ -153,7 +154,7 @@ const saveVMLetStatus = async () => {
                 "port_https": `${HTTPS_PORT}`,
                 "version": "3",
                 "tracker": "https://apiroom.net/",
-                "description": "restroom-mw",
+                "description": DESCRIPTION,
                 "State": STATE,
                 "Country": `${COUNTRY}`,
                 "L0": L0_DEST

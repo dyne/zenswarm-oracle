@@ -27,6 +27,11 @@ This repository contains some utilities that allow a user to
 </p>
 
 ## 🔨 Usage
+Before using Zenswarm oracle you need:
+* Zenroom
+* Jq
+* Docker
+
 The `secrets` directory will be shared with the zenswarm oracle container.
 For example, this will let the oracle read the keyring we are going to generate.
 

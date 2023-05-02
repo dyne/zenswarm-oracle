@@ -17,18 +17,19 @@ keygen: ## Generate a new oracle keyring [DESCRIPTION]
 	if [ -f ${SECRET}/${KEYS} ]; then printf "Delete the old ${SECRET}/${KEYS} file\n"; exit 1; fi ;\
 	tmp=$$(mktemp) ;\
 	echo "{\"controller\": \"${DESCRIPTION}\"}" > $${tmp} ;\
-	zenroom -z -k $${tmp} announce_contacts/create_keys_and_pks.zen | tee ${SECRET}/keys.json && \
+	zenroom -z -k $${tmp} announce_contracts/create_keys_and_pks.zen | tee ${SECRET}/keys.json && \
 	rm -f $${tmp}
 
 announce: SIGN_KEYRING ?= oracle_keyring.json
+announce: ORACLE_KEYRING ?= ${SECRET}/keys.json
 announce: ## Create and send a DID request for the oracle [SIGN_KEYRING, ORACLE_KEYRING]
 	$(if $(wildcard ${SIGN_KEYRING}),,$(error Oracle admin keyring not found in SIGN_KEYRING=${SIGN_KEYRING}, cannot sign))
-	$(if $(value ORACLE_KEYRING),,$(error Oracle keyring not found, save it and add the path as ORACLE_KEYRING="<path>"))
+	$(if $(value ORACLE_KEYRING),,$(error Oracle keyring not found, add the path as ORACLE_KEYRING="<path>"))
 	@tmp=$$(mktemp) ;\
 	tmp2=$$(mktemp) ;\
 	jq --arg ts $$(($$(date +%s%N)/1000000)) '.timestamp = $$ts' ${SIGN_KEYRING} > $${tmp} ;\
-	jq -s '.[0] * .[1]' $${tmp} announce_contacts/announce.keys > $${tmp2}  ;\
-	zenroom -z -k $${tmp2} -a ${ORACLE_KEYRING} announce_contacts/announce.zen > $${tmp} ;\
+	jq -s '.[0] * .[1]' $${tmp} announce_contracts/announce.keys > $${tmp2}  ;\
+	zenroom -z -k $${tmp2} -a ${ORACLE_KEYRING} announce_contracts/announce.zen > $${tmp} ;\
 	restroom-test -s ${RR_SCHEMA} -h ${RR_HOST} -p ${RR_PORT} -u v1/sandbox/pubkeys-accept.chain -a $${tmp} | tee ${SECRET}/last_did.json ;\
 	rm -f ${tmp} ${tmp2} ;\
 
@@ -44,13 +45,14 @@ kill: ## Stop the oracle container
 
 
 goodbye: SIGN_KEYRING ?= oracle_keyring.json
+goodbye: ORACLE_KEYRING ?= ${SECRET}/keys.json
 goodbye: ## Oracle deannounce (deactivate DID) [SIGN_KEYRING, ORACLE_KEYRING]
 	$(if $(wildcard ${SIGN_KEYRING}),,$(error Oracle admin keyring not found in SIGN_KEYRING=${SIGN_KEYRING}, cannot sign))
-	$(if $(value ORACLE_KEYRING),,$(error Oracle keyring not found, save it and add the path as ORACLE_KEYRING="<path>"))
+	$(if $(value ORACLE_KEYRING),,$(error Oracle keyring not found, add the path as ORACLE_KEYRING="<path>"))
 	@tmp=$$(mktemp) ;\
 	tmp2=$$(mktemp) ;\
-	jq -s '.[0] * .[1]' ${SIGN_KEYRING} announce_contacts/goodbye.keys > $${tmp} ;\
-	zenroom -z -k $${tmp} -a ${ORACLE_KEYRING} announce_contacts/goodbye.zen > $${tmp2} ;\
+	jq -s '.[0] * .[1]' ${SIGN_KEYRING} announce_contracts/goodbye.keys > $${tmp} ;\
+	zenroom -z -k $${tmp} -a ${ORACLE_KEYRING} announce_contracts/goodbye.zen > $${tmp2} ;\
 	cat $${tmp2} ;\
 	restroom-test -s ${RR_SCHEMA} -h ${RR_HOST} -p ${RR_PORT} -u v1/sandbox/pubkeys-deactivate.chain -a $${tmp2} ;\
 	| tee ${SECRET}/last_did_deactivated.json ;\

@@ -7,7 +7,7 @@ Scenario 'schnorr': Create the public key
 Scenario 'eddsa': Create the public key
 Given I read the content of 'keys.json'
 # Loading the private keys
-Given I am known as '....'
+Given my name is in a 'string' named 'description'
 Given I have my 'keyring'
 
 # Generating the public keys

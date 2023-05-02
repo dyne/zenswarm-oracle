@@ -31,20 +31,21 @@ Before using Zenswarm oracle you need:
 * Zenroom
 * Jq
 * Docker
+* Restroom-test
 
 The `secrets` directory will be shared with the zenswarm oracle container.
 For example, this will let the oracle read the keyring we are going to generate.
 
 The first step is to generate the keyring of the oracle
 ```bash
-  make keygen
+  make keygen DESCRIPTION="test oracle"
 ```
 This command will generate a file `secrets/keys.json` with the newly created keyring.
 
 Then, one has to announce the oracle to the DID controller. 
 For this step, one need an admin keyring (if you want to try please contact us at [info@dyne.org](info@dyne.org).
 ```bash
-  make announce ORACLE_KEYRING=... SIGN_KEYRING=secret/keys.json
+  make announce SIGN_KEYRING=...
 ```
 
 At this point, one can run the oracle instance
@@ -55,7 +56,7 @@ At this point, one can run the oracle instance
 
 Finally, one can deannounce the oracle
 ```bash
-  make goodbye SIGN_KEYRING=secret/keys.json ORACLE_KEYRING=...
+  make goodbye SIGN_KEYRING=...
 ```
 
 

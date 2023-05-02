@@ -20,7 +20,7 @@ keygen: ## Generate a new oracle keyring [DESCRIPTION]
 	zenroom -z -k $${tmp} announce_contracts/create_keys_and_pks.zen | tee ${SECRET}/keys.json && \
 	rm -f $${tmp}
 
-announce: SIGN_KEYRING ?= oracle_keyring.json
+announce: SIGN_KEYRING ?= ${SECRET}/oracle_keyring.json
 announce: ORACLE_KEYRING ?= ${SECRET}/keys.json
 announce: ## Create and send a DID request for the oracle [SIGN_KEYRING, ORACLE_KEYRING]
 	$(if $(wildcard ${SIGN_KEYRING}),,$(error Oracle admin keyring not found in SIGN_KEYRING=${SIGN_KEYRING}, cannot sign))
@@ -44,7 +44,7 @@ kill: ## Stop the oracle container
 	@docker rm zenswarm-oracle
 
 
-goodbye: SIGN_KEYRING ?= oracle_keyring.json
+goodbye: SIGN_KEYRING ?= ${SECRET}/oracle_keyring.json
 goodbye: ORACLE_KEYRING ?= ${SECRET}/keys.json
 goodbye: ## Oracle deannounce (deactivate DID) [SIGN_KEYRING, ORACLE_KEYRING]
 	$(if $(wildcard ${SIGN_KEYRING}),,$(error Oracle admin keyring not found in SIGN_KEYRING=${SIGN_KEYRING}, cannot sign))
@@ -54,7 +54,7 @@ goodbye: ## Oracle deannounce (deactivate DID) [SIGN_KEYRING, ORACLE_KEYRING]
 	jq -s '.[0] * .[1]' ${SIGN_KEYRING} announce_contracts/goodbye.keys > $${tmp} ;\
 	zenroom -z -k $${tmp} -a ${ORACLE_KEYRING} announce_contracts/goodbye.zen > $${tmp2} ;\
 	cat $${tmp2} ;\
-	restroom-test -s ${RR_SCHEMA} -h ${RR_HOST} -p ${RR_PORT} -u v1/sandbox/pubkeys-deactivate.chain -a $${tmp2} ;\
+	restroom-test -s ${RR_SCHEMA} -h ${RR_HOST} -p ${RR_PORT} -u v1/sandbox/pubkeys-deactivate.chain -a $${tmp2} \
 	| tee ${SECRET}/last_did_deactivated.json ;\
 	rm -f $${tmp} $${tmp2}
 

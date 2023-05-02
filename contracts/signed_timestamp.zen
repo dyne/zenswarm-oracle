@@ -1,0 +1,24 @@
+Rule caller restroom-mw
+Scenario 'eddsa': signature
+
+# Loading keys
+Given I read the content of 'keys.json'
+Given my name is in a 'string' named 'description'
+Given I have my 'keyring'
+
+# Taking timestamp
+Given I fetch the local timestamp and store it into 'timestamp'
+Given I have a 'integer' named 'timestamp'
+
+# sign timestamp
+When I create the eddsa signature of 'timestamp'
+
+# craft did eendpoint resolution
+When I create the eddsa public key
+and I set 'did_resolution' to 'https://did.dyne.org/dids/did:dyne:sandbox.zenswarm:' as 'string'
+and I append the 'base58' of 'eddsa_public_key' to 'did_resolution'
+
+Then print the 'timestamp'
+and print the 'eddsa signature'
+and print the 'did_resolution'
+

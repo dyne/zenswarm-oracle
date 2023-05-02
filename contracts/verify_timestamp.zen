@@ -1,0 +1,23 @@
+Rule caller restroom-mw
+Scenario 'eddsa': verify signature
+Scenario 'w3c': did document
+
+# Resolve did
+Given I have a endpoint named 'did_resolution'
+Given I connect to 'did_resolution' and save the output into 'did_document'
+Given I have a 'string dictionary' named 'did_document'
+
+Given I have a 'eddsa signature'
+Given I have a 'integer' named 'timestamp'
+
+# verify did doc is not deactivated
+When I pickup from path 'did_document.result.didDocumentMetadata.deactivated'
+and I set 'true' to 'true' as 'string'
+and I verify 'deactivated' is not equal to 'true'
+
+# verify signature
+When I pickup from path 'did_document.result.didDocument'
+and I create the 'eddsa' public key from did document 'didDocument'
+and I verify the 'timestamp' has a eddsa signature in 'eddsa signature' by 'eddsa public key'
+
+Then print the string 'signature verified from DID document!'

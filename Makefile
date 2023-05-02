@@ -61,3 +61,8 @@ goodbye: ## Oracle deannounce (deactivate DID) [SIGN_KEYRING, ORACLE_KEYRING]
 ##@ Image management
 build:
 	docker build -t zenswarm-oracle .
+
+test_api:
+	$(if $(value ZENCODE), ,$(error Enter the zencode api as ZENCODE="<api name>"))
+	@if [ ! -z ${DATA} ]; then INPUT_DATA="-a $${DATA}"; fi; \
+	restroom-test -p 3000 -u $${ZENCODE} $${INPUT_DATA}

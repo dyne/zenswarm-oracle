@@ -1,0 +1,6 @@
+Rule caller restroom-mw
+
+Given I read the content of 'DID.json'
+Given I have a 'string' named 'DID'
+
+Then print the 'DID'

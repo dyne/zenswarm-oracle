@@ -1,0 +1,19 @@
+Rule caller restroom-mw
+
+Scenario 'ecdh': verifies signature
+
+# keys
+Given I have a 'string' named 'myFolder'
+Given I have a 'ecdh public key' from 'Apiroom' 
+
+# data
+Given I have a 'string dictionary' named 'update' inside 'updateInfo'
+Given I have a 'base64 dictionary' named 'update.signature' inside 'updateInfo'
+
+When I verify the 'update' has a ecdh signature in 'update.signature' by 'Apiroom' 
+When I pickup from path 'update.myFile'
+
+Then print the string 'Zenroom verified the Apiroom signature are all correct!' 
+Then print the 'myFile'
+Then print the 'myFolder'
+Then I download the 'myFile' and extract it into 'myFolder'

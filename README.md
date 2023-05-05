@@ -43,11 +43,12 @@ The first step is to generate the keyring of the oracle
 This command will generate a file `secrets/keys.json` with the newly created keyring.
 
 Then, one has to announce the oracle to the DID controller. 
-For this step, one need an admin keyring (if you want to try please contact us at [info@dyne.org](info@dyne.org)).
 ```bash
-  make announce SIGN_KEYRING=...
+  make announce
 ```
-where `SIGN_KEYRING` indicates the path to reach the admin keyring, the deafult is `secrets/oracle_keyring.json`.
+This command will generate two files:
+* `secrets/DID.json` with the the DID;
+* `secrets/DID_document.json` with the the DID document and the DID document metadata;
 
 At this point, one can run the oracle instance
 ```bash
@@ -61,11 +62,10 @@ To stop the container simply run
   make kill
 ```
 
-Finally, one can deannounce the oracle
+Finally, once the oracle is no more needed, one have to deannounce the oracle to the DID controller.
 ```bash
-  make goodbye SIGN_KEYRING=...
+  make goodbye
 ```
-where `SIGN_KEYRING` indicates the path to reach the admin keyring, the deafult is `secrets/oracle_keyring.json`.
 
 ## 😍 Acknowledgements
 

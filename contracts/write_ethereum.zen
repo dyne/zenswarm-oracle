@@ -3,7 +3,7 @@ Rule caller restroom-mw
 Scenario 'ethereum': store data
 
 Given I read the content of 'keys.json'
-Given my name is in a 'string' named 'description'
+Given my name is in a 'string' named 'identity'
 Given I have my 'keyring'
 
 Given I have a ethereum endpoint named 'evm_endpoint'

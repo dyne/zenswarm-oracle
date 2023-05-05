@@ -1,0 +1,10 @@
+Rule caller restroom-mw
+
+Scenario 'w3c': did document
+
+Given I read the content of 'DID_document.json'
+Given I have a 'did_document' named 'didDocument'
+Given I have a 'string dictionary' named 'didDocumentMetadata'
+
+Then print the 'didDocument'
+and print the 'didDocumentMetadata'

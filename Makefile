@@ -35,8 +35,8 @@ announce: ## Create and send a DID request for the oracle [SIGN_KEYRING, ORACLE_
 
 run: ## Run the oracle container
 	@docker run -d --name "${CONTAINER}" \
-		--mount type=bind,source="$$(pwd)"/secrets,target=/app/secrets \
-		--mount type=bind,source="$$(pwd)"/contracts,target=/app/contracts \
+		--mount type=bind,source="$$(pwd)/secrets,target=/var/secrets" \
+		--mount type=bind,source="$$(pwd)/contracts,target=/var/contracts" \
 		-p 3000:3000 \
 		zenswarm-oracle
 kill: ## Stop the oracle container

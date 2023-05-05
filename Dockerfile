@@ -24,7 +24,9 @@ WORKDIR /app
 RUN apk add git python3 make g++
 
 # Installing restroom
-RUN npx -y create-restroom@next -a --no-@restroom-mw/sawroom .
+COPY ./restroom.mjs .
+COPY ./package.json .
+COPY ./yarn.lock .
 
 # Configure restroom
 ENV HTTP_PORT=3000
@@ -32,9 +34,12 @@ ENV HTTPS_PORT=3301
 ENV OPENAPI=true
 ENV CHAIN_EXT=chain
 ENV YML_EXT=yml
+ENV ZENCODE_DIR=/var/contracts
+ENV FILES_DIR=/var/secrets
 
 RUN mkdir -p /var/contracts
 RUN mkdir -p /var/secrets
+RUN yarn
 
 # yarn install and run
-CMD FILES_DIR=./secrets yarn start
+CMD [ "yarn", "start" ]

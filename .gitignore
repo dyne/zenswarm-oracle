@@ -1,6 +1,6 @@
+# restroom stuff
 node_modules
 .env
-access.log
 
 # secrets
 secrets

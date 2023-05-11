@@ -1,0 +1,19 @@
+Rule caller restroom-mw
+Scenario 'ecdh': signature
+
+# Loading keys
+Given I read the content of 'keys.json'
+Given my name is in a 'string' named 'identity'
+Given I have my 'keyring'
+
+# Load DID
+Given I read the content of 'DID.json'
+Given I have a 'string' named 'DID'
+
+# sign timestamp
+When I create the random 'oracle_random'
+and I create the ecdh signature of 'oracle_random'
+
+Then print the 'oracle_random'
+and print the 'ecdh signature'
+and print the 'DID'

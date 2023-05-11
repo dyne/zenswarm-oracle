@@ -21,7 +21,8 @@ import morgan from "morgan"
 import dotenv from "dotenv";
 dotenv.config();
 
-const HTTP_PORT = parseInt(process.env.HTTP_PORT || "3000", 10);
+const HTTP_PORT = parseInt(process.env.HTTP_PORT || "80", 10);
+const LOCAL_PORT = parseInt(process.env.LOCAL_PORT || "3000", 10);
 const HOST = process.env.HOST || "0.0.0.0";
 const ZENCODE_DIR = process.env.ZENCODE_DIR;
 const OPENAPI = JSON.parse(process.env.OPENAPI || true);
@@ -63,7 +64,7 @@ const contracts = fs.readdirSync(ZENCODE_DIR);
 
 if (contracts.length > 0) {
   const httpServer = http.createServer(app);
-  httpServer.listen(HTTP_PORT, HOST, () => {
+  httpServer.listen(LOCAL_PORT, HOST, () => {
     console.log(`🚻 Restroom started on http://${chalk.bold.blue(HOST)}:${HTTP_PORT}`);
     console.log(`📁 the ZENCODE directory is: ${chalk.magenta.underline(ZENCODE_DIR)} \n`);
 

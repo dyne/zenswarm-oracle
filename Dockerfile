@@ -29,8 +29,9 @@ COPY ./package.json .
 COPY ./yarn.lock .
 
 # Configure restroom
-ENV HTTP_PORT=3000
-ENV HTTPS_PORT=3301
+ENV HTTP_PORT=80
+ENV HTTPS_PORT=443
+ENV LOCAL_PORT=3000
 ENV OPENAPI=true
 ENV CHAIN_EXT=chain
 ENV YML_EXT=yml

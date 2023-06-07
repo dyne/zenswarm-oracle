@@ -43,6 +43,7 @@ const ZENCODE_DIR = process.env.ZENCODE_DIR;
 const OPENAPI = JSON.parse(process.env.OPENAPI || true);
 const YML_EXT = process.env.YML_EXT || "yaml";
 const CHAIN_EXT = process.env.CHAIN_EXT || "chain";
+const SUBSCRIPTION_FILE = process.env.SUBSCRIPTION_FILE || "secrets/subscriptions.json";
 
 const app = express();
 
@@ -69,14 +70,20 @@ app.use(git.default);
 import {
   readFile
 } from 'fs/promises';
-const subscriptions = JSON.parse(
-  await readFile(
-    new URL('./subscriptions.json',
-      import.meta.url)
-  )
-).oracleActions;
-Object.keys(subscriptions).forEach(
-  key => subscriptions[key].name = key);
+let subscriptions = null
+
+try {
+  subscriptions = JSON.parse(
+    await readFile(
+      new URL(SUBSCRIPTION_FILE,
+        import.meta.url)
+    )
+  ).oracleActions;
+  Object.keys(subscriptions).forEach(
+    key => subscriptions[key].name = key);
+} catch(e) {
+  L.warn("NO subscriptions loaded")
+}
 
 
 /*
@@ -142,6 +149,9 @@ const subscribeFn = {
 }
 
 function dispatchSubscriptions() {
+  if(subscriptions == null) {
+    return;
+  }
   Object.keys(subscriptions).forEach(
     key => {
       try {

@@ -8,6 +8,7 @@ KEYS := keys.json
 CONTAINER := zenswarm-oracle
 IMAGE := ghcr.io/dyne/zenswarm-oracle
 
+HOST := 0.0.0.0
 PORT := 9000
 
 help: ## Display this help.
@@ -46,10 +47,13 @@ announce: ## Create and send a DID request for the oracle [ORACLE_KEYRING]
 	rm -f $${tmp} $${tmp2};
 
 run: ## Run the oracle container
+	@[ -d logger ] || mkdir logger
 	@docker run -d --name "${CONTAINER}" \
 		--mount type=bind,source="$$(pwd)/secrets,target=/var/secrets" \
 		--mount type=bind,source="$$(pwd)/contracts,target=/var/contracts" \
-		-p ${PORT}:3000 \
+		--mount type=bind,source="$$(pwd)/logger,target=/var/logger" \
+		-p ${PORT}:3000 -e "LOGGER_DIR=/var/logger" -e "HOST=${HOST}" \
+		-e "SUBSCRIPTION_FILE=/var/secrets/subscriptions.json" \
 		${IMAGE}
 kill: ## Stop the oracle container
 	@docker kill zenswarm-oracle

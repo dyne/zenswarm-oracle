@@ -1,0 +1,5 @@
+Rule unknown ignore
+Given I have a 'string' named 'path'
+Given I have a 'string' named 'blockNumber'
+Then I append the string 'blockNumber' to the logfile named by 'path'
+Then print data

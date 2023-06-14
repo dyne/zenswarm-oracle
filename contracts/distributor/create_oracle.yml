@@ -1,0 +1,99 @@
+zenchain: 1.0
+start: 1_sign_request.zen
+blocks:
+  1_create_request.zen:
+    zenContent: |
+      Rule caller restroom-mw
+      Rule input encoding base58
+      Rule output encoding base58
+
+      Scenario 'ecdh': keys
+      Scenario 'eddsa': keys
+      Scenario 'ethereum': keys
+      Scenario 'reflow': keys
+
+      # timestamp in messages to avoid replay attack
+      Given I fetch the local timestamp and store it into 'timestamp'
+      Given I have a 'string' named 'timestamp'
+
+      # load the spec admin keyring to sign the request
+      Given I read the content of 'keys.json'
+      Given my name is in a 'string' named 'identity'
+      and I have my 'keyring'
+
+      # data
+      Given I have a 'did document'
+
+      # keys
+      Given I have a 'string' named 'signer_did_spec'
+
+      # did document signature
+      When I create the json of 'did document'
+      and I create the ecdh signature of 'json'
+      and I remove 'json'
+
+      # result signature
+      When I create the 'string dictionary' named 'result'
+      and I copy 'did document' in 'result'
+      and I copy 'timestamp' in 'result'
+      and I create the json of 'result'
+      and I create the eddsa signature of 'json'
+
+      # signer id
+      When I create the eddsa public key
+      and I set 'id' to 'did:dyne:' as 'string'
+      and I append 'signer_did_spec' to 'id'
+      and I append the string ':' to 'id'
+      and I append the 'base58' of 'eddsa public key' to 'id'
+
+      Then print the 'did document'
+      and print the 'ecdh signature'
+      and print the 'eddsa signature'
+      and print the 'id'
+    keysFile: 1_sign_request.keys
+    next: 2_prepare_post.zen
+  2_prepare_post.zen:
+    zenContent: |
+      Scenario 'ecdh': keys
+      Scenario 'eddsa': keys
+      Scenario 'ethereum': keys
+      Scenario 'reflow': keys
+
+      Given I have a 'string dictionary' named 'did document'
+      and I have a 'string dictionary' named 'ecdh signature'
+      and I have a 'string' named 'timestamp'
+      and I have a 'string' named 'eddsa signature'
+      and I have a 'string' named 'id'
+      # prepare post
+      When I create the 'string dictionary' named 'post'
+      and I create the 'string dictionary' named 'data'
+      and I move 'did document' in 'data'
+      and I move 'ecdh signature' in 'data'
+      and I move 'timestamp' in 'data'
+      and I move 'eddsa signature' in 'data'
+      and I move 'id' in 'data'
+      and I move 'data' in 'post'
+
+      Then print the 'post'
+    next: 3_send_post.zen
+  3_send_post.zen:
+    zenContent: |
+      Rule caller restroom-mw
+
+      Given I connect to 'endpoint' and pass it the content of 'post' and save the output into 'response'
+      and I have a 'string dictionary' named 'response'
+
+      When I pickup from path 'response.status'
+      When I set '200' to '200' as 'float'
+
+      When I verify 'status' is equal to '200'
+      When I pickup from path 'response.result.result.didDocument.id'
+      and I rename 'id' to 'DID'
+      When I set 'DID_show_explorer' to 'https://explorer.did.dyne.org/details/' as 'string'
+      and I append 'DID' to 'DID_show_explorer'
+      When I set 'resolve_DID' to 'https://did.dyne.org/dids/' as 'string'
+      and I append 'DID' to 'resolve_DID'
+      Then print the 'DID'
+      Then print the 'DID_show_explorer'
+      Then print the 'resolve_DID'
+    keysFile: 3_send_post.keys

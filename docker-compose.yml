@@ -1,0 +1,26 @@
+version: '3.8'
+services:
+  zenswarm-oracle:
+    image: ghcr.io/dyne/zenswarm-oracle
+    container_name: ${ORACLE_NAME:-zenswarm-oracle}
+    volumes:
+      - ./secrets:/var/secrets
+      - ./logger:/var/logger
+      - ./contracts/${ORACLE_TYPE}:/var/contracts
+      - ./contracts/common:/var/common
+    environment:
+      - LOGGER_DIR=/var/logger
+      - HOST=${HOST}
+      - SUBSCRIPTION_FILE=/var/secrets/subscriptions.json
+    ports:
+      - ${PORT}:3000
+  redis:
+    image: redis:7-alpine
+    container_name: ${ORACLE_NAME:-zenswarm-oracle}-redis
+    restart: always
+    command: ["redis-server", "--save", "20", "1", "--loglevel", "warning"]
+    volumes:
+      - redis-vol:/data
+volumes:
+  redis-vol:
+    driver: local

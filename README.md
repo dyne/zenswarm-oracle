@@ -67,6 +67,44 @@ Finally, once the oracle is no more needed, one have to deannounce the oracle to
   make goodbye
 ```
 
+## Oracle Flow
+
+### Distributor
+First of all, you have to start a distributor. It will keep a list of announced oracles, it will announce new oracles and dsitribute a request at random.
+
+One can start a distributor oracle using
+```
+make run ORACLE_TYPE=distributor
+```
+
+It will expose and API that will let other oracle announce.
+During this phase it will have to:
+1. record its domain name in redis;
+1. authorize its public key (with a call to a smart contract);
+1. (TODO: record its DID).
+
+### Common
+During startup it will have to announce to a distributor, by sending a JSON like
+```
+{
+  "domain_name": "....",
+  "address": "....",
+  ....?
+}
+```
+using the command
+```
+make announce
+```
+
+And can start the oracle with
+```
+make run ORACLE_TYPE=common
+```
+
+At this point, the node owner can submit the signature of its address to the Smart Contract
+
+
 ## 😍 Acknowledgements
 
 <a href="https://dyne.org">

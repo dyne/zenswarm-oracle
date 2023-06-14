@@ -5,9 +5,6 @@ RR_SCHEMA := https
 SECRET := secrets
 KEYS := keys.json
 
-CONTAINER := zenswarm-oracle
-IMAGE := ghcr.io/dyne/zenswarm-oracle
-
 HOST := 0.0.0.0
 PORT := 9000
 
@@ -46,18 +43,13 @@ announce: ## Create and send a DID request for the oracle [ORACLE_KEYRING]
 	curl -s $$(jq -r '.resolve_DID' $${tmp2}) | jq | tee ${SECRET}/DID_document.json; \
 	rm -f $${tmp} $${tmp2};
 
+run: ORACLE_TYPE ?= common
 run: ## Run the oracle container
 	@[ -d logger ] || mkdir logger
-	@docker run -d --name "${CONTAINER}" \
-		--mount type=bind,source="$$(pwd)/secrets,target=/var/secrets" \
-		--mount type=bind,source="$$(pwd)/contracts,target=/var/contracts" \
-		--mount type=bind,source="$$(pwd)/logger,target=/var/logger" \
-		-p ${PORT}:3000 -e "LOGGER_DIR=/var/logger" -e "HOST=${HOST}" \
-		-e "SUBSCRIPTION_FILE=/var/secrets/subscriptions.json" \
-		${IMAGE}
+	PORT=${PORT} HOST=${HOST} ORACLE_TYPE=${ORACLE_TYPE} docker compose up
+
 kill: ## Stop the oracle container
-	@docker kill zenswarm-oracle
-	@docker rm zenswarm-oracle
+	@docker compose down
 
 goodbye: ORACLE_KEYRING ?= ${SECRET}/keys.json
 goodbye: ## Oracle deannounce (deactivate DID) [ORACLE_KEYRING]

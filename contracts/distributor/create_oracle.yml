@@ -13,6 +13,9 @@ blocks:
       Scenario 'reflow': keys
       Scenario 'w3c': keys
 
+      # redis
+      Given I have a valid redis connection on 'redis://localhost:6379'
+
       # timestamp in messages to avoid replay attack
       Given I fetch the local timestamp and store it into 'timestamp'
       Given I have a 'string' named 'timestamp'
@@ -52,6 +55,8 @@ blocks:
       and print the 'eddsa signature'
       and print the 'id'
       and print the 'timestamp'
+
+      Then I write 'did_document' into redis under the key named by 'id'
     keysFile: 1_sign_request.keys
     next: 2_prepare_post.zen
   2_prepare_post.zen:

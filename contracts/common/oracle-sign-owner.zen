@@ -1,0 +1,19 @@
+Rule caller restroom-mw
+
+Scenario ethereum:
+
+Given I read the content of 'keys.json'
+Given my name is in a 'string' named 'identity'
+Given I have my 'keyring'
+Given I have a 'hex' named 'message'
+# It would be nice to be able to read it as a  ethereum address
+Given I have a 'string' named 'owner' 
+When I append 'owner' to 'message'
+
+When I create the ethereum signature of 'message'
+
+When I create the ethereum address
+
+Then print the 'ethereum signature'
+Then print the 'ethereum address'
+Then print the 'message' as 'string'

@@ -1,0 +1,13 @@
+Rule caller restroom-mw
+
+Scenario ethereum:
+
+Given I have a 'ethereum signature'
+Given I have a 'ethereum address' named 'oracle'
+Given I have a 'hex' named 'message'
+Given I have a 'string' named 'owner' 
+When I append 'owner' to 'message'
+
+When I verify the 'message' has a ethereum signature in 'ethereum signature' by 'oracle'
+
+Then print the string 'The signature is valid'

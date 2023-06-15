@@ -43,10 +43,11 @@ announce: ## Create and send a DID request for the oracle [ORACLE_KEYRING]
 	curl -s $$(jq -r '.resolve_DID' $${tmp2}) | jq | tee ${SECRET}/DID_document.json; \
 	rm -f $${tmp} $${tmp2};
 
+run: SECRETS=./secrets
 run: ORACLE_TYPE ?= common
 run: ## Run the oracle container
 	@[ -d logger ] || mkdir logger
-	PORT=${PORT} HOST=${HOST} ORACLE_TYPE=${ORACLE_TYPE} docker compose up
+	PORT=${PORT} HOST=${HOST} ORACLE_TYPE=${ORACLE_TYPE} SECRETS=${SECRETS} docker compose up
 
 kill: ## Stop the oracle container
 	@docker compose down

@@ -4,13 +4,13 @@ services:
     image: ghcr.io/dyne/zenswarm-oracle
     container_name: ${ORACLE_NAME:-zenswarm-oracle}
     volumes:
-      - ./secrets:/var/secrets
+      - ${SECRETS:-./secrets}:/var/secrets
       - ./logger:/var/logger
       - ./contracts/${ORACLE_TYPE}:/var/contracts
       - ./contracts/common:/var/common
     environment:
       - LOGGER_DIR=/var/logger
-      - HOST=${HOST}
+      - HOST=${HOST:-0.0.0.0}
       - SUBSCRIPTION_FILE=/var/secrets/subscriptions.json
     ports:
       - ${PORT}:3000

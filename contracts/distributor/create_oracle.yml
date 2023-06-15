@@ -50,6 +50,7 @@ blocks:
       and print the 'ecdh signature'
       and print the 'eddsa signature'
       and print the 'id'
+      and print the 'timestamp'
     keysFile: 1_sign_request.keys
     next: 2_prepare_post.zen
   2_prepare_post.zen:

@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+SECRET="secrets-oracle-$1" DESCRIPTION="test oracle $1" make keygen
+SECRET=./secrets-oracle-$1 URL="https://$2/" make announce

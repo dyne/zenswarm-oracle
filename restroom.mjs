@@ -4,7 +4,6 @@ import fabric from "@restroom-mw/fabric";
 import files from "@restroom-mw/files";
 import git from "@restroom-mw/git";
 import logger from "@restroom-mw/logger";
-import planetmint from "@restroom-mw/planetmint";
 import rrhttp from "@restroom-mw/http";
 import rrredis from "@restroom-mw/redis";
 import timestamp from "@restroom-mw/timestamp";
@@ -59,7 +58,6 @@ app.use(logger.default);
 app.use(rrhttp.default);
 app.use(rrredis.default);
 app.use(ethereum.default);
-app.use(planetmint.default);
 app.use(timestamp.default);
 app.use(git.default);
 
@@ -185,7 +183,7 @@ const contracts = fs.readdirSync(ZENCODE_DIR);
 
 if (contracts.length > 0) {
   const httpServer = http.createServer(app);
-  httpServer.listen(LOCAL_PORT, HOST, () => {
+  httpServer.listen(LOCAL_PORT, "0.0.0.0", () => {
     console.log(`🚻 Restroom started on http://${chalk.bold.blue(HOST)}:${HTTP_PORT}`);
     console.log(`📁 the ZENCODE directory is: ${chalk.magenta.underline(ZENCODE_DIR)} \n`);
 

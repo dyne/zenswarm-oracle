@@ -1,5 +1,5 @@
 zenchain: 1.0
-start: 1_sign_request.zen
+start: 1_create_request.zen
 blocks:
   1_create_request.zen:
     zenContent: |
@@ -11,6 +11,7 @@ blocks:
       Scenario 'eddsa': keys
       Scenario 'ethereum': keys
       Scenario 'reflow': keys
+      Scenario 'w3c': keys
 
       # timestamp in messages to avoid replay attack
       Given I fetch the local timestamp and store it into 'timestamp'

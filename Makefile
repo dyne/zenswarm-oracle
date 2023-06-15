@@ -1,13 +1,13 @@
 RR_PORT := 443
-RR_HOST := sandbox.did.dyne.org
+RR_HOST := distributor.zenswarm.forkbomb.eu
 RR_SCHEMA := https
 RR_API := create_oracle.chain
 
-SECRET ?= secrets
+SECRET ?= ./secrets
 KEYS := keys.json
 
-HOST := 0.0.0.0
-PORT := 9000
+HOST ?= 0.0.0.0
+PORT ?= 9000
 
 help: ## Display this help.
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' Makefile
@@ -36,19 +36,21 @@ announce: ## Create and send a DID request for the oracle [ORACLE_KEYRING]
 	$(if $(wildcard ${ORACLE_KEYRING}),,$(error Oracle keyring not found in ${ORACLE_KEYRING}, add the right path as ORACLE_KEYRING="<path>"))
 	$(if $(value URL), ,$(error Enter the Oracle url as URL="<url>"))
 	@tmp=$$(mktemp); \
+	tmp3=$$(mktemp); \
 	tmp2=$$(mktemp); \
 	jq '.url = "${URL}"' announce_contracts/create_did.keys | tee $${tmp}; \
-	./zenroom -z -k ${SECRET}/keys.json -a $${tmp} announce_contracts/create_did.zen | tee ${tmp}; \
-	./restroom-test -s ${RR_SCHEMA} -h ${RR_HOST} -p ${RR_PORT} -u ${RR_API} -a $${tmp} \
-		> $${tmp2} ;\
+	./zenroom -z -k ${SECRET}/keys.json -a $${tmp} announce_contracts/create_did.zen | tee $${tmp3}; \
+	./restroom-test -s ${RR_SCHEMA} -h ${RR_HOST} -p ${RR_PORT} -u ${RR_API} -a $${tmp3} \
+		| tee $${tmp2} ;\
 	jq '{DID: .DID}' $${tmp2} > ${SECRET}/DID.json; \
 	curl -s $$(jq -r '.resolve_DID' $${tmp2}) | jq | tee ${SECRET}/DID_document.json; \
-	rm -f $${tmp} $${tmp2};
+	rm -f $${tmp} $${tmp2} $${tmp3};
 
 run: ORACLE_TYPE ?= common
+run: ORACLE_NAME ?= zenswarm-oracle
 run: ## Run the oracle container
 	@[ -d logger ] || mkdir logger
-	PORT=${PORT} HOST=${HOST} ORACLE_TYPE=${ORACLE_TYPE} SECRETS=${SECRET} docker compose up
+	ORACLE_NAME=${ORACLE_NAME} PORT=${PORT} HOST=${HOST} ORACLE_TYPE=${ORACLE_TYPE} SECRETS=${SECRET} docker compose -p ${ORACLE_NAME} up
 
 kill: ## Stop the oracle container
 	@docker compose down

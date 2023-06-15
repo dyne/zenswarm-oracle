@@ -1,8 +1,9 @@
 RR_PORT := 443
 RR_HOST := sandbox.did.dyne.org
 RR_SCHEMA := https
+RR_API := create_oracle.chain
 
-SECRET := secrets
+SECRET ?= secrets
 KEYS := keys.json
 
 HOST := 0.0.0.0
@@ -33,21 +34,21 @@ keygen: ## Generate a new oracle keyring [DESCRIPTION]
 announce: ORACLE_KEYRING ?= ${SECRET}/keys.json
 announce: ## Create and send a DID request for the oracle [ORACLE_KEYRING]
 	$(if $(wildcard ${ORACLE_KEYRING}),,$(error Oracle keyring not found in ${ORACLE_KEYRING}, add the right path as ORACLE_KEYRING="<path>"))
+	$(if $(value URL), ,$(error Enter the Oracle url as URL="<url>"))
 	@tmp=$$(mktemp); \
 	tmp2=$$(mktemp); \
-	identity=$$(jq -r '.identity' ${ORACLE_KEYRING}); \
-	jq --arg id $${identity} 'del(.[$$id])' ${ORACLE_KEYRING} > $${tmp}; \
-	./restroom-test -s ${RR_SCHEMA} -h ${RR_HOST} -p ${RR_PORT} -u zenswarm/create_sandbox_did.chain -a $${tmp} \
+	jq '.url = "${URL}"' announce_contracts/create_did.keys | tee $${tmp}; \
+	./zenroom -z -k ${SECRET}/keys.json -a $${tmp} announce_contracts/create_did.zen | tee ${tmp}; \
+	./restroom-test -s ${RR_SCHEMA} -h ${RR_HOST} -p ${RR_PORT} -u ${RR_API} -a $${tmp} \
 		> $${tmp2} ;\
 	jq '{DID: .DID}' $${tmp2} > ${SECRET}/DID.json; \
 	curl -s $$(jq -r '.resolve_DID' $${tmp2}) | jq | tee ${SECRET}/DID_document.json; \
 	rm -f $${tmp} $${tmp2};
 
-run: SECRETS=./secrets
 run: ORACLE_TYPE ?= common
 run: ## Run the oracle container
 	@[ -d logger ] || mkdir logger
-	PORT=${PORT} HOST=${HOST} ORACLE_TYPE=${ORACLE_TYPE} SECRETS=${SECRETS} docker compose up
+	PORT=${PORT} HOST=${HOST} ORACLE_TYPE=${ORACLE_TYPE} SECRETS=${SECRET} docker compose up
 
 kill: ## Stop the oracle container
 	@docker compose down

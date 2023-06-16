@@ -1,0 +1,6 @@
+database: "sqlite:///var/secrets/dids.db"
+create_table: |
+        CREATE TABLE IF NOT EXISTS "dids" (
+                "did"   TEXT NOT NULL UNIQUE,
+                PRIMARY KEY("did")
+        );

@@ -1,0 +1,6 @@
+Rule caller restroom-mw
+
+Given I have a database uri named 'database'
+Given I have a 'string dictionary' named 'result_1'
+Given I execute the SQL statement named 'create_table' on the database named 'database' and save the result into 'result_1'
+Then print data

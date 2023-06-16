@@ -13,9 +13,6 @@ blocks:
       Scenario 'reflow': keys
       Scenario 'w3c': keys
 
-      # redis
-      Given I have a valid redis connection on 'redis://localhost:6379'
-
       # timestamp in messages to avoid replay attack
       Given I fetch the local timestamp and store it into 'timestamp'
       Given I have a 'string' named 'timestamp'
@@ -50,23 +47,33 @@ blocks:
       and I append the string ':' to 'id'
       and I append the 'base58' of 'eddsa public key' to 'id'
 
+      When I create the copy of 'id' from 'did document'
+      and I rename the 'copy' to 'request id'
+      When I create the new array
+      When I rename the 'new array' to 'query_params'
+      When I copy 'request id' in 'query_params'
+
       Then print the 'did document'
       and print the 'ecdh signature'
       and print the 'eddsa signature'
       and print the 'id'
       and print the 'timestamp'
-
-      Then I write 'did_document' into redis under the key named by 'id'
+      and print the 'query params' as 'string'
     keysFile: 1_sign_request.keys
     next: 2_prepare_post.zen
   2_prepare_post.zen:
     zenContent: |
+      Rule caller restroom-mw
       Scenario 'ecdh': keys
       Scenario 'eddsa': keys
       Scenario 'ethereum': keys
       Scenario 'reflow': keys
 
+      Given I have a 'string dictionary' named 'storage_result'
+      Given I have a database uri named 'database'
       Given I have a 'string dictionary' named 'did document'
+      Given I execute the SQL statement named 'insert_query' pass the parameters named 'query_params' on the database named 'database' and save the result into 'storage_result'
+
       and I have a 'string dictionary' named 'ecdh signature'
       and I have a 'string' named 'timestamp'
       and I have a 'string' named 'eddsa signature'
@@ -82,11 +89,14 @@ blocks:
       and I move 'data' in 'post'
 
       Then print the 'post'
+      Then print the 'storage_result'
+    keysFile: 2_prepare_post.keys
     next: 3_send_post.zen
   3_send_post.zen:
     zenContent: |
       Rule caller restroom-mw
 
+      Given I have a 'string dictionary' named 'storage_result'
       Given I connect to 'endpoint' and pass it the content of 'post' and save the output into 'response'
       and I have a 'string dictionary' named 'response'
 
@@ -103,4 +113,5 @@ blocks:
       Then print the 'DID'
       Then print the 'DID_show_explorer'
       Then print the 'resolve_DID'
+      Then print the 'storage_result'
     keysFile: 3_send_post.keys

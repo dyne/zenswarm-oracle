@@ -1,0 +1,5 @@
+{
+    "database": "sqlite:///var/secrets/dids.db",
+    "insert_query": "INSERT OR IGNORE INTO dids(did) VALUES (?);"
+}
+

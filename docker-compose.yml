@@ -3,6 +3,10 @@ services:
   zenswarm-oracle:
     image: ghcr.io/dyne/zenswarm-oracle
     container_name: ${ORACLE_NAME:-zenswarm-oracle}
+    build:
+      dockerfile: Dockerfile
+      tags:
+        - ghcr.io/dyne/zenswarm-oracle
     volumes:
       - ${SECRETS:-./secrets}:/var/secrets
       - ./logger:/var/logger
@@ -14,13 +18,3 @@ services:
       - SUBSCRIPTION_FILE=/var/secrets/subscriptions.json
     ports:
       - ${PORT}:3000
-  redis:
-    image: redis:7-alpine
-    container_name: ${ORACLE_NAME:-zenswarm-oracle}-redis
-    restart: always
-    command: ["redis-server", "--save", "20", "1", "--loglevel", "warning"]
-    volumes:
-      - redis-vol:/data
-volumes:
-  redis-vol:
-    driver: local

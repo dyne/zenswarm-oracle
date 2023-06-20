@@ -1,0 +1,13 @@
+{
+ "oracleActions": {
+  "ganash-event1": {
+   "subscription": "wss://...",
+   "rpc": "https://....",
+   "listen": {
+     "address": "0xe18413d3fbd48d5342B0e2DAbAD061E7Ad587166"
+   },
+   "blockchain": "ethereum",
+   "trigger": "http://127.0.0.1:3000/api/test-log"
+  }
+ }
+}

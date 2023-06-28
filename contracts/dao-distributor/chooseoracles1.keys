@@ -1,0 +1,1 @@
+{"database":"sqlite:///var/secrets/dids.db","read_oracles":"select * from dids","one":1,"four":3,"base url":"https://did.dyne.org/dids/"}

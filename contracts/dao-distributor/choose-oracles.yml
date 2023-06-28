@@ -1,0 +1,148 @@
+zenchain: 1.0
+start: chooseoracles1.zen
+blocks:
+  chooseoracles1.zen:
+    zenContent: >
+      Rule caller restroom-mw
+
+      Given I have a database uri named 'database'
+
+      Given I have a 'string array' named 'post'
+
+      Given I execute the SQL statement named 'read_oracles' on the database
+      named 'database' and save the result into 'dids'
+
+
+      Given I have a 'string array' named 'dids'
+
+      Given I have a 'float' named 'one'
+
+      Given I have a 'float' named 'four'
+
+      Given I have a 'string' named 'base url'
+
+      When I create the 'string array'
+
+      When I rename the 'string array' to 'chosen dids'
+
+      Foreach 'i' in sequence from 'one' to 'four' with step 'one'
+
+      When I pick the random object in 'dids'
+
+      When I remove the 'random object' from 'dids'
+
+
+      When I create the copy of 'did' from dictionary 'random object'
+
+      When I rename 'copy' to 'did'
+
+      When I copy 'base url' to 'url'
+
+      When I append 'did' to 'url'
+
+      When I move 'url' in 'chosen dids'
+
+      when I delete the 'random object'
+
+      when I delete the 'did'
+
+      endforeach
+
+      Then print the 'post'
+
+      Then print the 'chosen_dids'
+    keysFile: chooseoracles1.keys
+    next: chooseoracles2.zen
+  chooseoracles2.zen:
+    zenContent: >
+      Rule caller restroom-mw
+
+      Given I have a 'string array' named 'post'
+
+      Given I have a 'string array' named 'results' in 'output'
+
+      Given I execute parallel GET to array 'chosen_dids' and save the result
+      named 'results' within the object 'output'
+
+
+      Given I have a 'string' named 'api name'
+
+      When I create the 'string array'
+
+      When I rename the 'string array' to 'oracle urls'
+
+
+      Foreach 'o' in 'results'
+
+      When I pickup from path 'o.result.didDocument.url'
+
+      When I append 'api name' to 'url'
+
+      When I move 'url' in 'oracle urls'
+
+      endforeach
+
+
+      Then print the 'oracle urls'
+
+      Then print the 'post' 
+    keysFile: chooseoracles2.keys
+    next: chooseoracles3.zen
+  chooseoracles3.zen:
+    zenContent: >
+      # Always use 'Rule caller restroom-mw' when using Restroom
+
+      Rule caller restroom-mw
+
+
+      # [R] Restroom-mw statements: state endpoints
+
+      Given I have a 'string array' named 'oracle_urls'
+
+
+      # Loading input data and telling Zenroom that 'post' will be created by
+      Restroom-mw
+
+      Given I have a 'string dictionary' named 'post'
+
+
+      # Here Restroom-mw performs the REST calls and stores the output in
+      'output'
+
+      Given I fetch the local timestamp and store it into 'timestamp' 
+
+      Given I have a 'string' named 'timestamp'
+
+      Given I have a 'string dictionary' named 'output'
+
+      Given I execute parallel POST with 'post' to array 'oracle_urls' and save
+      the result named 'output'
+
+      When I create the json escaped string of 'output'
+
+      When I create the 'string array'
+
+      When I rename the 'string array' to 'query params'
+
+      When I move 'timestamp' in 'query params'
+
+      When I move 'json escaped string' in 'query params'
+
+      # Print the output
+
+      Then print the 'query params'
+    next: chooseoracles4.zen
+  chooseoracles4.zen:
+    zenContent: >-
+      Rule caller restroom-mw
+
+      Given I have a database uri named 'database'
+      
+      Given I have a 'string dictionary' named 'result_1'
+
+      Given I execute the SQL statement named 'insert_log' pass the parameters
+      named 'query_params' on the database named 'database' and save the result
+      into 'result_6'
+
+      Then print data
+    keysFile: chooseoracles4.keys

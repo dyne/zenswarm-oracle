@@ -4,3 +4,9 @@ create_table: |
                 "did"   TEXT NOT NULL UNIQUE,
                 PRIMARY KEY("did")
         );
+create_table2: |
+        CREATE TABLE IF NOT EXISTS "signature_verification_logs" (
+                "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+                "timestamp" INTEGER NOT NULL,
+                "output" TEXT NOT NULL
+        );

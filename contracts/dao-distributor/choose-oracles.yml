@@ -137,12 +137,14 @@ blocks:
       Rule caller restroom-mw
 
       Given I have a database uri named 'database'
-      
-      Given I have a 'string dictionary' named 'result_1'
+
+      Given I have a 'string array' named 'result'
+
+      Given I have a 'string array' named 'query_params'
 
       Given I execute the SQL statement named 'insert_log' pass the parameters
       named 'query_params' on the database named 'database' and save the result
-      into 'result_6'
+      into 'result'
 
       Then print data
     keysFile: chooseoracles4.keys

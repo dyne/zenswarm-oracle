@@ -1,6 +1,6 @@
-RR_PORT := 443
-RR_HOST := distributor.zenswarm.forkbomb.eu
-RR_SCHEMA := https
+RR_PORT := 9000
+RR_HOST := localhost
+RR_SCHEMA := http
 RR_API := create_oracle.chain
 
 SECRET ?= ./secrets
@@ -67,7 +67,7 @@ goodbye: ## Oracle deannounce (deactivate DID) [ORACLE_KEYRING]
 
 ##@ Image management
 build:
-	docker build -t ${IMAGE} .
+	docker compose build
 
 test_api:
 	$(if $(value ZENCODE), ,$(error Enter the zencode api as ZENCODE="<api name>"))

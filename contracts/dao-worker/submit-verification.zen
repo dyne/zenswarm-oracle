@@ -11,9 +11,6 @@ Given I have a 'string array' named 'typeSpec'
 
 # Here we load the signatures array, the adresses array and the messages
 # the arrays can be of arbitrary length, but elements of the respective arrays have to match
-Given I have a 'ethereum address array' named 'addresses'
-Given I have a 'ethereum signature array' named 'signatures'
-Given I have a 'string' named 'signed-string'
 
 Given I read the content of 'keys.json'
 Given my name is in a 'string' named 'identity'
@@ -32,12 +29,22 @@ Given I read the ethereum suggested gas price
 and a 'gas price'
 and a 'gas limit'
 
+Given that I have an endpoint named 'endpoint'
+
+Given I have a 'string dictionary' named 'dataFromEndpoint'
+
+Given I connect to 'endpoint' and save the output into 'dataFromEndpoint'
+
+Given I have a 'ethereum signature array' in path 'dataFromEndpoint.result.signatures'
+Given I have a 'ethereum address array' in path 'dataFromEndpoint.result.addresses'
+Given I have a 'string' in path 'dataFromEndpoint.result.signed-string'
+
 When I create the ethereum address
 
 # here we create an empty array that will be returned as output
 When I create the 'string array' named 'verification-output'
 
-When I set 'status and' to 'verified' as 'string'
+When I set 'status and' to 'true' as 'string'
 
 # here we setup a nested foreach loop, to verify each signature for each address
 # and define that we will call each element of the arrays 'loop signature' and 'loop address'
@@ -64,7 +71,7 @@ endif
 
 if I verify 'status' is equal to 'non verified'
 When I delete 'status and'
-When I set 'status and' to 'non verified' as 'string'
+When I set 'status and' to 'false' as 'string'
 endif
 # here we do the last steps in composing the output
 When I move 'status' in 'output'
@@ -94,6 +101,7 @@ When I pickup from path 'ethereum signature.r'
 When I move 'r' in 'new array'
 When I pickup from path 'ethereum signature.s'
 When I move 's' in 'new array'
+When I copy 'status_and' in 'new array'
 
 When I create the ethereum transaction to 'dao address'
 and I use the ethereum transaction to run 'submitMethod' using 'new array'

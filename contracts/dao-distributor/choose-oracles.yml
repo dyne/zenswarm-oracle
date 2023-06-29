@@ -138,13 +138,23 @@ blocks:
 
       Given I have a database uri named 'database'
 
-      Given I have a 'string array' named 'result'
+      Given I have a 'string array' named 'database_actions_result'
 
       Given I have a 'string array' named 'query_params'
 
       Given I execute the SQL statement named 'insert_log' pass the parameters
       named 'query_params' on the database named 'database' and save the result
-      into 'result'
+      into 'database_actions_result'
 
-      Then print data
+
+      When I create the copy of element '2' in array 'query_params'
+
+      When I create the json unescaped object of 'copy'
+
+      When I rename the 'json unescaped object' to 'worker_oracles_output'
+
+
+      Then print the 'worker_oracles_output'
+
+      Then print the 'database_actions_result'
     keysFile: chooseoracles4.keys

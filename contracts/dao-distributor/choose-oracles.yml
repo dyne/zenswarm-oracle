@@ -1,6 +1,46 @@
 zenchain: 1.0
-start: chooseoracles1.zen
+start: chooseoracles0.zen
 blocks:
+  chooseoracles0.zen:
+    zenContent: |
+      Rule caller restroom-mw
+
+      Scenario 'ethereum': convert from event data
+      Given I read the content of 'keys.json'
+      Given I read the content of 'urls.json'
+
+      Given I have a 'string' named 'ethereum address'
+      Given I have a 'string' named 'eth_url'
+      Given I have a 'string' named 'endpoint'
+
+
+      Given I have a 'hex' named 'data'
+      Given I rename 'data' to 'encoded data'
+      Given I have a 'string array' named 'typeSpec'
+      When I create the ethereum abi decoding of 'encoded data' using 'typeSpec'
+      When I create the copy of element '1' in array 'ethereum abi decoding'
+      When I rename 'copy' to 'request_id'
+      When I create the copy of element '3' in array 'ethereum abi decoding'
+      When I rename 'copy' to 'dao_vote_id'
+
+      When I create the 'string dictionary'
+      When I rename the 'string dictionary' to 'data'
+      When I create the 'string dictionary'
+      When I rename the 'string dictionary' to 'post'
+
+      When I rename the 'ethereum address' to 'caller address'
+      When I move 'caller address' in 'data'
+      When I move 'eth url' in 'data'
+      When I move 'endpoint' in 'data'
+      When I move 'dao_vote_id' in 'data'
+      When I move 'request_id' in 'data'
+
+
+      When I move 'data' in 'post'
+
+      Then print the 'post'
+    keysFile: chooseoracles0.keys
+    next: chooseoracles1.zen
   chooseoracles1.zen:
     zenContent: >
       Rule caller restroom-mw
@@ -133,7 +173,7 @@ blocks:
       Then print the 'query params'
     next: chooseoracles4.zen
   chooseoracles4.zen:
-    zenContent: >-
+    zenContent: >
       Rule caller restroom-mw
 
       Given I have a database uri named 'database'

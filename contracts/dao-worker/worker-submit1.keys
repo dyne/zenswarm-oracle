@@ -1,0 +1,1 @@
+{"non verified":"non verified","verified":"verified","message":"NodeJob","typeSpec":["string","address","address","uint256"],"submitMethod":{"name":"submitVerification","input":["uint8","bytes32","bytes32","bool","uint256"],"output":[]},"dao_address":"0xd2c2E878884ebD12C9F9EBd661406Fa5bceF8972","gas_limit":50000,"chain_id":"80001"}

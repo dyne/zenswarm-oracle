@@ -250,3 +250,4 @@ blocks:
 
 
       Then print the 'ethereum address'
+    keysFile: worker-submit1.keys

@@ -1,0 +1,7 @@
+{
+  "influx": {
+    "token": "insert_token",
+    "url": "insert_url",
+    "org": "insert_org"
+  }
+}

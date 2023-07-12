@@ -1,0 +1,6 @@
+{
+  "flux_query_1": "from(bucket: \"hestia\") |> range(start: ",
+  "flux_query_2": ", stop: ",
+  "flux_query_3": ") |> filter(fn: (r) => r._measurement == \"active_energy\" and r.device_id == \"",
+  "flux_query_4": "\") |> difference() |> sum() |> map(fn: (r) => ({r with _value: string(v: uint(v: r._value)), _start: string(v: uint(v: r._start) / uint(v: 1000000000))}))"
+}

@@ -42,6 +42,8 @@ blocks:
 
       Given I have a 'string array' named 'typeSpec'
 
+      Given I have a 'string' named 'chain id'
+
 
       Given I read the ethereum nonce for 'ethereum_address'
 
@@ -82,10 +84,6 @@ blocks:
 
       Given I read the ethereum suggested gas price
 
-      and a 'gas price'
-
-      and a 'gas limit'
-
 
       Given that I have an endpoint named 'endpoint'
 
@@ -103,6 +101,13 @@ blocks:
       'dataFromEndpoint.result.addresses'
 
       Given I have a 'string' in path 'dataFromEndpoint.result.signed-string'
+
+
+      Given I read the ethereum suggested gas price
+
+      Given I have a 'gas price'
+
+      and a 'gas limit'
 
 
       When I create the ethereum address
@@ -227,7 +232,11 @@ blocks:
       and I use the ethereum transaction to run 'submitMethod' using 'new array'
 
 
-      When I create the signed ethereum transaction for chain 'fabt'
+      When I create the signed ethereum transaction for chain 'chain id'
+
+
+      # Then I ask ethereum to broadcast the 'signed_ethereum_transaction' and
+      save the transaction id in 'txid'
 
       Then print the 'signed ethereum transaction'
 

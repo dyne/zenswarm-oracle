@@ -9,7 +9,7 @@ blocks:
       Given I read the content of 'keys.json'
       Given I read the content of 'urls.json'
 
-      Given I have a 'string' named 'ethereum address'
+      Given I have a 'string' named 'caller address'
       Given I have a 'string' named 'eth_url'
       Given I have a 'string' named 'endpoint'
 
@@ -28,7 +28,6 @@ blocks:
       When I create the 'string dictionary'
       When I rename the 'string dictionary' to 'post'
 
-      When I rename the 'ethereum address' to 'caller address'
       When I move 'caller address' in 'data'
       When I move 'eth url' in 'data'
       When I move 'endpoint' in 'data'
@@ -97,6 +96,28 @@ blocks:
     zenContent: >
       Rule caller restroom-mw
 
+
+      Scenario 'w3c':
+
+      Scenario 'ethereum':
+
+
+      Given I read the content of './keys.json'
+
+
+      Given my name is in a 'string' named 'identity'
+
+      Given I have my 'keyring'
+
+
+      Given I have a 'hex' named 'ethereum address'
+
+      Given I rename 'ethereum address' to 'caller address'
+
+
+      Given I have a 'string' named 'message'
+
+
       Given I have a 'string array' named 'post'
 
       Given I have a 'string array' named 'results' in 'output'
@@ -107,9 +128,26 @@ blocks:
 
       Given I have a 'string' named 'api name'
 
+
+      Given I have a 'string array' named 'typeSpec'
+
+
       When I create the 'string array'
 
       When I rename the 'string array' to 'oracle urls'
+
+
+      When I create the 'hex array'
+
+      When I rename the 'hex array' to 'signatures'
+
+
+      When I create the 'hex array'
+
+      When I rename the 'hex array' to 'abi_encodings'
+
+
+      When I pickup from path 'post.data.dao_vote_id'
 
 
       Foreach 'o' in 'results'
@@ -120,15 +158,94 @@ blocks:
 
       When I move 'url' in 'oracle urls'
 
+
+      When I pickup from path 'o.result.didDocument'
+
+
+      When I create the verificationMethod of 'didDocument'
+
+      When I pickup from path 'verificationMethod.ethereum_address'
+
+
+      When I create the new array
+
+      When I copy 'message' in 'new array'
+
+      When I move 'ethereum address' in 'new array'
+
+      When I copy 'caller address' in 'new array'
+
+      When I copy 'dao vote id' in 'new array'
+
+      When I create the ethereum abi encoding of 'new array' using 'typeSpec'
+
+      When I create the hash of 'ethereum abi encoding' using 'keccak256'
+
+      When I delete 'new array'
+
+
+      When I rename the 'hash' to 'message.keccak'
+
+
+      When I create the ethereum signature of 'message.keccak'
+
+
+      When I move 'ethereum signature' in 'signatures'
+
+
+
+      When I move 'ethereum abi encoding' in 'abi_encodings'
+
+
+      When I delete the 'didDocument'
+
+      When I delete the 'verificationMethod'
+
+      When I delete the 'message.keccak'
+
       endforeach
 
 
       Then print the 'oracle urls'
 
       Then print the 'post' 
+
+      Then print the 'signatures' 
+
+      Then print the 'abi_encodings'
     keysFile: chooseoracles2.keys
     next: chooseoracles3.zen
   chooseoracles3.zen:
+    zenContent: |
+      # Always use 'Rule caller restroom-mw' when using Restroom
+      Rule caller restroom-mw
+
+      # [R] Restroom-mw statements: state endpoints
+      Given I have a 'string array' named 'oracle_urls'
+      Given I have a 'string array' named 'signatures'
+      Given I have a 'string dictionary' named 'data' in 'post'
+      Given I rename 'data' to 'olddata'
+
+      When I create the 'string array'
+      When I rename the 'string array' to 'posts'
+
+      Foreach 'signature' in 'signatures'
+
+      When I copy 'olddata' to 'data'
+      When I move 'signature' in 'data'
+
+      When I create the 'string dictionary'
+      When I rename the 'string dictionary' to 'newpost'
+      When I move 'data' in 'newpost'
+      When I move 'newpost' in 'posts'
+
+
+      endforeach
+
+      Then print the 'posts'
+      Then print the 'oracle_urls'
+    next: chooseoracles4.zen
+  chooseoracles4.zen:
     zenContent: >
       # Always use 'Rule caller restroom-mw' when using Restroom
 
@@ -143,7 +260,7 @@ blocks:
       # Loading input data and telling Zenroom that 'post' will be created by
       Restroom-mw
 
-      Given I have a 'string dictionary' named 'post'
+      Given I have a 'string dictionary' named 'posts'
 
 
       # Here Restroom-mw performs the REST calls and stores the output in
@@ -155,8 +272,8 @@ blocks:
 
       Given I have a 'string dictionary' named 'output'
 
-      Given I execute parallel POST with 'post' to array 'oracle_urls' and save
-      the result named 'output'
+      Given I execute parallel POST with array 'posts' to array 'oracle_urls'
+      and save the result named 'output'
 
       When I create the json escaped string of 'output'
 
@@ -171,8 +288,8 @@ blocks:
       # Print the output
 
       Then print the 'query params'
-    next: chooseoracles4.zen
-  chooseoracles4.zen:
+    next: chooseoracles5.zen
+  chooseoracles5.zen:
     zenContent: >
       Rule caller restroom-mw
 
@@ -197,4 +314,4 @@ blocks:
       Then print the 'worker_oracles_output'
 
       Then print the 'database_actions_result'
-    keysFile: chooseoracles4.keys
+    keysFile: chooseoracles5.keys

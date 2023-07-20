@@ -15,9 +15,9 @@ blocks:
       Given I have a 'ethereum address' named 'caller_address'
       Given I have a 'string' named 'eth_url'
       Given I have a 'string' named 'endpoint'
+      Given I have a 'string dictionary' named 'signature'
 
       Then print data
-    keysFile: worker-submit0.keys
     next: worker-submit1.zen
   worker-submit1.zen:
     zenContent: >
@@ -28,10 +28,15 @@ blocks:
 
       Given I read the content of 'keys.json'
 
+      Given I read the content of 'oracle.json'
+
 
       Given I have a ethereum endpoint named 'eth_url'
 
 
+      Given I have a 'ethereum signature' named 'signature'
+
+      GIven I rename 'signature' to 'ethereum signature'
 
 
       Given I have a 'string' named 'non verified'
@@ -74,7 +79,7 @@ blocks:
 
       Given I have a ethereum endpoint named 'eth_url'
 
-      Given I have a 'ethereum address' named 'dao address'
+      Given I have a 'ethereum address' named 'oracle address'
 
       Given I have a 'ethereum nonce'
 
@@ -126,6 +131,7 @@ blocks:
 
       # and define that we will call each element of the arrays 'loop signature'
       and 'loop address'
+
 
       Foreach 'loop_signature' in 'signatures'
 
@@ -185,28 +191,6 @@ blocks:
       endforeach
 
 
-      When I create the new array
-
-      When I move 'message' in 'new array'
-
-      When I copy 'ethereum address' in 'new array'
-
-      When I move 'caller address' in 'new array'
-
-      When I move 'dao vote id' in 'new array'
-
-      When I create the ethereum abi encoding of 'new array' using 'typeSpec'
-
-      When I create the hash of 'ethereum abi encoding' using 'keccak256'
-
-      When I delete 'new array'
-
-
-      When I rename the 'hash' to 'message.keccak'
-
-
-      When I create the ethereum signature of 'message.keccak'
-
       When I copy 'ethereum signature' to 'ethereum signature rsv'
 
 
@@ -226,8 +210,10 @@ blocks:
 
       When I copy 'status_and' in 'new array'
 
+      When I copy 'request id' in 'new array'
 
-      When I create the ethereum transaction to 'dao address'
+
+      When I create the ethereum transaction to 'oracle address'
 
       and I use the ethereum transaction to run 'submitMethod' using 'new array'
 
@@ -253,7 +239,6 @@ blocks:
 
       Then print the 'ethereum signature'
 
-      Then print the 'ethereum abi encoding'
 
       Then print the 'ethereum signature rsv' as 'hex'
 

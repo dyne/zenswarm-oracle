@@ -3,10 +3,9 @@
 A group of users make a poll, each users vote by creating the Ethereum signature of a message, the signature can be created from Metamask. An array of signatures (along with ethereum addresses of the signees) is stored on IPFS.
 
 ```mermaid
-mindmap
-  root((GOAL))
-    verify the signatures off-chain
-    return the outcome of the verification to an Ethereum smart contract
+flowchart TD
+    A[GOALS] --> B(verify the signatures off-chain)
+    A[GOALS] --> C(return the outcome of the verification\n to an Ethereum smart contract)
 ```
 
 The goal is to: 

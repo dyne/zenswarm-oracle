@@ -2,11 +2,30 @@
 
 A group of users make a poll, each users vote by creating the Ethereum signature of a message, the signature can be created from Metamask. An array of signatures (along with ethereum addresses of the signees) is stored on IPFS.
 
+```mermaid
+mindmap
+  root((GOAL))
+    verify the signatures off-chain
+    return the outcome of the verification to an Ethereum smart contract
+```
+
 The goal is to: 
 - verify the signatures off-chain (using Zenswarm oracles) 
 - return the outcome of the verification to an Ethereum smart contract (also using Zenswarm oracles)
 
 ## Architecture
+```mermaid
+classDiagram
+    Oracle <|-- Distributor
+    Oracle <|-- Worker
+    Oracle: custom restroom-mw instance
+    Oracle: can listen to WebSockets
+    Oracle: start a zencode contract when it receives a message
+    Distributor : dispatch work to the workers
+    Distributor : listens to the chain
+    Worker: verify an array of signatures
+    Worker: create a transaction on chain with their result
+```
 Zenswarm oracles are custom [restroom-mw](https://github.com/dyne/restroom-mw) instances, that can listen to WebSockets and start a zencode contract when they receive a message.
 
 In this use case, we use two types of Zenswarm oracles:

@@ -59,9 +59,9 @@ goodbye: ORACLE_KEYRING ?= ${SECRET}/keys.json
 goodbye: ## Oracle deannounce (deactivate DID) [ORACLE_KEYRING]
 	$(if $(wildcard ${ORACLE_KEYRING}),,$(error Oracle keyring not found in ${ORACLE_KEYRING}, add the right path as ORACLE_KEYRING="<path>"))
 	@tmp=$$(mktemp); \
-	jq '{eddsa_public_key: .eddsa_public_key}' ${ORACLE_KEYRING} > $${tmp}; \
-	./restroom-test -s ${RR_SCHEMA} -h ${RR_HOST} -p ${RR_PORT} -u zenswarm/deactivate_sandbox_did.chain -a $${tmp} \
-		| jq '{DID: .Deactivated_DID}' \
+	./zenroom -z -a announce_contracts/deactivate_did.keys -k secrets/keys.json announce_contracts/deactivate_did.zen > $${tmp}; \
+	./restroom-test -s https -h did.dyne.org -p 443 -u v1/sandbox/pubkeys-deactivate.chain -a $${tmp} \
+		| jq '{DID: .result.didDocument.id}' \
 		| tee ${SECRET}/last_did_deactivated.json ;\
 	rm -f $${tmp};
 

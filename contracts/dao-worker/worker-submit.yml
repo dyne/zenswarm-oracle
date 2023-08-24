@@ -221,7 +221,7 @@ blocks:
       When I create the signed ethereum transaction for chain 'chain id'
 
 
-      # Then I ask ethereum to broadcast the 'signed_ethereum_transaction' and
+      Then I ask ethereum to broadcast the 'signed_ethereum_transaction' and
       save the transaction id in 'txid'
 
       Then print the 'signed ethereum transaction'

@@ -104,15 +104,16 @@ blocks:
 
       Given I read the content of './keys.json'
 
+      Given I read the content of './urls.json'
+
 
       Given my name is in a 'string' named 'identity'
 
       Given I have my 'keyring'
 
 
-      Given I have a 'hex' named 'ethereum address'
+      Given I have a 'hex' named 'caller address'
 
-      Given I rename 'ethereum address' to 'caller address'
 
 
       Given I have a 'string' named 'message'
@@ -130,6 +131,8 @@ blocks:
 
 
       Given I have a 'string array' named 'typeSpec'
+      
+      Given I have a 'integer' in path 'post.data.dao_vote_id'
 
 
       When I create the 'string array'
@@ -147,8 +150,9 @@ blocks:
       When I rename the 'hex array' to 'abi_encodings'
 
 
-      When I pickup from path 'post.data.dao_vote_id'
+      When I create the 'hex array'
 
+      When I rename the 'hex array' to 'keccaks'
 
       Foreach 'o' in 'results'
 
@@ -184,6 +188,9 @@ blocks:
       When I delete 'new array'
 
 
+      when I copy 'hash' in 'keccaks'
+
+
       When I rename the 'hash' to 'message.keccak'
 
 
@@ -213,12 +220,19 @@ blocks:
       Then print the 'signatures' 
 
       Then print the 'abi_encodings'
+
+      then print 'keccaks'
     keysFile: chooseoracles2.keys
     next: chooseoracles3.zen
   chooseoracles3.zen:
     zenContent: |
       # Always use 'Rule caller restroom-mw' when using Restroom
       Rule caller restroom-mw
+
+
+      Given I have a 'string array' named 'keccaks'
+
+      Given I have a 'string array' named 'abi_encodings'
 
       # [R] Restroom-mw statements: state endpoints
       Given I have a 'string array' named 'oracle_urls'
@@ -244,12 +258,20 @@ blocks:
 
       Then print the 'posts'
       Then print the 'oracle_urls'
+
+      then print the 'keccaks'
+
+      then print the 'abi encodings'
     next: chooseoracles4.zen
   chooseoracles4.zen:
     zenContent: >
       # Always use 'Rule caller restroom-mw' when using Restroom
 
       Rule caller restroom-mw
+
+      Given I have a 'string array' named 'keccaks'
+
+      Given I have a 'string array' named 'abi_encodings'
 
 
       # [R] Restroom-mw statements: state endpoints
@@ -288,10 +310,20 @@ blocks:
       # Print the output
 
       Then print the 'query params'
+
+      then print the 'keccaks'
+
+      then print the 'abi encodings'
     next: chooseoracles5.zen
   chooseoracles5.zen:
     zenContent: >
       Rule caller restroom-mw
+
+
+      Given I have a 'string array' named 'keccaks'
+
+      Given I have a 'string array' named 'abi_encodings'
+
 
       Given I have a database uri named 'database'
 
@@ -314,4 +346,8 @@ blocks:
       Then print the 'worker_oracles_output'
 
       Then print the 'database_actions_result'
+
+      then print the 'keccaks'
+
+      then print the 'abi encodings'
     keysFile: chooseoracles5.keys

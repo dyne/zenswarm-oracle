@@ -32,7 +32,7 @@ keygen: ## Generate a new oracle keyring [DESCRIPTION]
 	rm -f $${tmp}
 
 announce: ORACLE_KEYRING ?= ${SECRET}/keys.json
-announce: ## Create and send a DID request for the oracle [ORACLE_KEYRING]
+announce: ## Create and send a DID request for the oracle [ORACLE_KEYRING, URL]
 	$(if $(wildcard ${ORACLE_KEYRING}),,$(error Oracle keyring not found in ${ORACLE_KEYRING}, add the right path as ORACLE_KEYRING="<path>"))
 	$(if $(value URL), ,$(error Enter the Oracle url as URL="<url>"))
 	@tmp=$$(mktemp); \
@@ -48,7 +48,7 @@ announce: ## Create and send a DID request for the oracle [ORACLE_KEYRING]
 
 run: ORACLE_TYPE ?= common
 run: ORACLE_NAME ?= zenswarm-oracle
-run: ## Run the oracle container
+run: ## Run the oracle container [ORACLE_NAME, ORACLE_TYPE]
 	@[ -d logger ] || mkdir logger
 	ORACLE_NAME=${ORACLE_NAME} PORT=${PORT} HOST=${HOST} ORACLE_TYPE=${ORACLE_TYPE} SECRETS=${SECRET} docker compose -p ${ORACLE_NAME} up
 

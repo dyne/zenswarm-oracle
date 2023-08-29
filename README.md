@@ -33,8 +33,10 @@ Before using Zenswarm oracle you need:
 * Docker
 * [Restroom-test](https://github.com/dyne/zencode-tools/releases/latest/)
 
-The `secrets` directory will be shared with the zenswarm oracle container.
+The `SECRET` directory will be shared with the zenswarm oracle container (by default is called `secrets`).
 For example, this will let the oracle read the keyring we are going to generate.
+
+The following commands also need a restroom instance with an Admin Keyring, you have to set the variables `RR_HOST`, `RR_PORT`, `RR_SCHEMA` and `RR_API` in the Makefile.
 
 The first step is to generate the keyring of the oracle
 ```bash
@@ -44,7 +46,7 @@ This command will generate a file `secrets/keys.json` with the newly created key
 
 Then, one has to announce the oracle to the DID controller. 
 ```bash
-  make announce
+  make announce URL=`IP or FQDN`
 ```
 This command will generate two files:
 * `secrets/DID.json` with the the DID;
@@ -53,7 +55,7 @@ This command will generate two files:
 At this point, one can run the oracle instance
 ```bash
   make build
-  make run
+  make run ORACLE_TYPE=common ORACLE_NAME=first-oracle
 ```
 That will be launched on localhost on port 3000. To see the available contracts visit http://localhost:3000/docs.
 

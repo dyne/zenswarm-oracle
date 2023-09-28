@@ -17,6 +17,7 @@
     "@restroom-mw/files": "next",
     "@restroom-mw/git": "next",
     "@restroom-mw/http": "next",
+    "@restroom-mw/influxdb": "^0.13.1-290bb68.91",
     "@restroom-mw/logger": "next",
     "@restroom-mw/redis": "next",
     "@restroom-mw/timestamp": "next",

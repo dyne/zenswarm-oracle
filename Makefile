@@ -2,6 +2,7 @@ RR_PORT := 9000
 RR_HOST := localhost
 RR_SCHEMA := http
 RR_API := create_oracle.chain
+#https://apiroom.net:443/api/W3CDID/create_sandbox_zenswarm_did.chain
 
 SECRET ?= ./secrets
 KEYS := keys.json

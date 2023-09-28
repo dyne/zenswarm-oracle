@@ -1,7 +1,7 @@
 {
   "1000": "1000",
   "period_ms": "43200000",
-  "query_period_1": "SELECT concat('\"'+(timestamp/1000)+'\"') timestamp, device_id, control, id FROM control_requests WHERE timestamp > '",
+  "query_period_1": "SELECT concat('\"'+(FLOOR(timestamp/1000))+'\"') timestamp, device_id, control, id FROM control_requests WHERE timestamp > '",
   "query_period_2": "' AND timestamp < '",
   "query_period_3": "' AND device_id = '",
   "query_period_4": "'",

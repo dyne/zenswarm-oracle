@@ -326,6 +326,13 @@ blocks:
     next: 5_compute_reward.zen
   5_compute_reward.zen:
     zenContent: |
+      Rule caller restroom-mw
+      Scenario 'eddsa': sign
+
+      Given I read the content of 'keys.json'
+      and my name is in a 'string' named 'identity'
+      and I have my 'keyring'
+
       # keys
       Given I have a 'string' named 'day'
       and I have a 'string' named 'night'
@@ -380,5 +387,9 @@ blocks:
       and I remove 'energy_imported'
       EndForeach
 
+      # sign the result
+      When I create the eddsa signature of 'output'
+
+      Then print the 'eddsa signature'
       Then print the 'output'
     keysFile: 5_compute_reward.keys

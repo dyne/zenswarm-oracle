@@ -262,6 +262,11 @@
     "@types/google-protobuf" "^3.15.5"
     google-protobuf "^3.19.4"
 
+"@influxdata/influxdb-client@^1.33.2":
+  version "1.33.2"
+  resolved "https://registry.yarnpkg.com/@influxdata/influxdb-client/-/influxdb-client-1.33.2.tgz#c68cfcf592e4e042361003143fbab99461410172"
+  integrity sha512-RT5SxH+grHAazo/YK3UTuWK/frPWRM0N7vkrCUyqVprDgQzlLP+bSK4ak2Jv3QVF/pazTnsxWjvtKZdwskV5Xw==
+
 "@mapbox/node-pre-gyp@^1.0.0":
   version "1.0.11"
   resolved "https://registry.yarnpkg.com/@mapbox/node-pre-gyp/-/node-pre-gyp-1.0.11.tgz#417db42b7f5323d79e93b34a6d7a2a12c0df43fa"
@@ -468,6 +473,13 @@
   integrity sha512-s9FN2NU9aQdPCS/ypnO1GOoWrWfpU9Fev+pxnP2nh/QbH1zqtZaaF0oWfun23Mhhs46YftNJ0wVuKZ1rG4Alog==
   dependencies:
     axios "^0.26.0"
+
+"@restroom-mw/influxdb@^0.13.1-290bb68.91":
+  version "0.13.1-290bb68.91"
+  resolved "https://registry.yarnpkg.com/@restroom-mw/influxdb/-/influxdb-0.13.1-290bb68.91.tgz#fb0b37293089c4ca23d4d7831a2a9689b0c43fc4"
+  integrity sha512-fHDotUO/KwQzdEpZRjF8/PGLz0az4H9sd+JDVzT7XhNnh9dsgcVOnL7JavpqpjZ4uF/wUxrgIWv1x6DviqzAog==
+  dependencies:
+    "@influxdata/influxdb-client" "^1.33.2"
 
 "@restroom-mw/logger@next":
   version "0.13.1-378d393.108"

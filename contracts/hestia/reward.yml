@@ -2,7 +2,7 @@ zenchain: 1.0
 start: 1_create_sql_queries.zen
 blocks:
   1_create_sql_queries.zen:
-    zenContent: |-
+    zenContent: |
       Rule caller restroom-mw
 
       Given I fetch the local timestamp and store it into 'final_timestamp'
@@ -70,158 +70,89 @@ blocks:
     keysFile: 1_create_sql_queries.keys
     next: 2_execute_sql_queries.zen
   2_execute_sql_queries.zen:
-    zenContent: >-
+    zenContent: |
       Rule caller restroom-mw
 
       Given I have a database uri named 'database'
-
-      Given I execute the SQL statement named 'query_period' on the database
-      named 'database' and save the result into 'sql_period_result'
-
+      Given I execute the SQL statement named 'query_period' on the database named 'database' and save the result into 'sql_period_result'
       Given I have a 'string array' named 'sql_period_result'
 
-
-      Given I execute the SQL statement named 'query_get_latest' on the database
-      named 'database' and save the result into 'sql_latest_result'
-
+      Given I execute the SQL statement named 'query_get_latest' on the database named 'database' and save the result into 'sql_latest_result'
       Given I have a 'string array' named 'sql_latest_result'
 
-
       # keys
-
       Given I have a 'string' named 'zero'
-
       Given I have a 'string' named 'one'
 
-
       #data
-
       Given I have a 'string' named 'final_timestamp'
-
       and I have a 'string' named 'start_timestamp'
-
       and I have a 'string' named 'device_imported'
-
       and I have a 'string' named 'device_exported'
-
       and I have a 'string' named 'time'
-
       and I have a 'string' named 'household_id'
 
-
-
       # array of timestamps for DR trigger
-
       When I create the 'string array' named 'DR_triggers_start_timestamp'
-
       and I copy 'start_timestamp' in 'DR_triggers_start_timestamp'
 
-
       When I create the 'string array' named 'DR_triggers_values'
-
-
       When I create the 'string dictionary' named 'sql_compact'
-
       Foreach 'dict' in 'sql_period_result'
-
       When I pickup from path 'dict.timestamp'
-
       When I pickup from path 'dict.control'
-
       When I create the json unescaped object of 'control'
-
       When I pickup from path 'json_unescaped_object.value'
-
       When I copy 'value' in 'DR_triggers_values'
-
       When I rename 'value' to named by 'timestamp'
-
       When I move named by 'timestamp' in 'sql_compact'
-
       If I verify the 'timestamp' is found in 'DR_triggers_start_timestamp'
-
       When I remove 'timestamp'
-
       EndIf
-
       If I verify the 'timestamp' is not found in 'DR_triggers_start_timestamp'
-
       When I move 'timestamp' in 'DR_triggers_start_timestamp'
-
       EndIf
-
       When I remove 'json_unescaped_object'
-
       and I remove 'control'
-
       Endforeach
 
-
       When I create the length of 'sql_period_result'
-
       If I verify 'length' is equal to 'zero'
-
       When I create the copy of element '1' in array 'sql_latest_result'
-
       and I pickup from path 'copy.control'
-
       and I remove 'copy'
-
       and I create the json unescaped object of 'control'
-
       and I pickup from path 'json_unescaped_object.value'
-
       and I copy 'value' in 'DR_triggers_values'
-
       and I rename 'value' to named by 'start_timestamp'
-
       and I move named by 'start_timestamp' in 'sql_compact'
-
       EndIf
-
 
       When I create the copy of element '1' in array 'DR_triggers_values'
-
       and I set 'DR_triggers_start_value' to '0' as 'string'
-
 
       If I verify the 'copy' is equal to 'zero'
-
       When I remove 'DR_triggers_start_value'
-
       and I set 'DR_triggers_start_value' to '0' as 'string'
-
       EndIf
-
 
       If I verify the 'start_timestamp' is not found in 'sql_compact'
-
       When I rename 'DR_triggers_start_value' to named by 'start_timestamp'
-
       and I move named by 'start_timestamp' in 'sql_compact'
-
       EndIf
 
-
       Then print the 'sql_compact'
-
       and print the 'final_timestamp'
-
       and print the 'start_timestamp'
-
       and print the 'DR_triggers_start_timestamp'
-
       and print the 'device_exported'
-
       and print the 'device_imported'
-
       and print the 'time'
-
       and print the 'household_id'
     keysFile: 2_execute_sql_queries.keys
     next: 3_create_flux_queries.zen
   3_create_flux_queries.zen:
-    zenContent: |-
+    zenContent: |
       # keys
       Given I have a 'string' named 'flux_query_1'
       and I have a 'string' named 'flux_query_2'
@@ -303,289 +234,151 @@ blocks:
     keysFile: 3_create_flux_queries.keys
     next: 4_execute_flux_queries.zen
   4_execute_flux_queries.zen:
-    zenContent: >-
+    zenContent: |
       Rule caller restroom-mw
 
-
       Given I connect to influxdb with the connection object named 'influx'
-
-      Given I execute the array of flux queries named 'flux_queries_exported'
-      and save the output into 'flux_result_exported'
-
+      Given I execute the array of flux queries named 'flux_queries_exported' and save the output into 'flux_result_exported'
       Given I have a 'string array' named 'flux_result_exported'
 
-
-      Given I execute the array of flux queries named 'flux_queries_imported'
-      and save the output into 'flux_result_imported'
-
+      Given I execute the array of flux queries named 'flux_queries_imported' and save the output into 'flux_result_imported'
       Given I have a 'string array' named 'flux_result_imported'
 
-
       # data
-
       Given I have a 'string dictionary' named 'sql_compact'
-
       and I have a 'string array' named 'DR_triggers_start_timestamp'
-
       and I have a 'string array' named 'DR_triggers_duration_timestamp'
-
       and I have a 'string' named 'time'
-
       and I have a 'string' named 'household_id'
 
-
       # reorganize influxdb response to be of the format
-
       # { <start_timestamp>: <delta_value>, ... }
-
       When I create the 'string dictionary' named 'flux_compact_exported'
-
       Foreach 'el' in 'flux_result_exported'
-
       When I pickup from path 'el._start'
-
       If I verify '_value' is found in 'el'
-
       When I pickup from path 'el._value'
-
       and I rename '_value' to named by '_start'
-
       and I move named by '_start' in 'flux_compact_exported'
-
       EndIf
-
       When I remove '_start'
-
       EndForeach
-
       If I verify 'el' is found
-
       When I remove 'el'
-
       Endif
-
       # reorganize influxdb response to be of the format
-
       # { <start_timestamp>: <delta_value>, ... }
-
       When I create the 'string dictionary' named 'flux_compact_imported'
-
       Foreach 'el' in 'flux_result_imported'
-
       When I pickup from path 'el._start'
-
       If I verify '_value' is found in 'el'
-
       When I pickup from path 'el._value'
-
       and I rename '_value' to named by '_start'
-
       and I move named by '_start' in 'flux_compact_imported'
-
       EndIf
-
       When I remove '_start'
-
       EndForeach
-
       If I verify 'el' is found
-
       When I remove 'el'
-
       Endif
-
 
       # aggregate all the information:
-
       # * DR_value -> 0 or 1
-
       # * period duration -> duration of DR_value in seconds
-
       # * energy_exported -> energy exported in period_duration
-
       # * energy_imported -> energy imported in period_duration
-
       # * period_start -> beginning of the period in secods
-
       When I create the 'string array' named 'results'
-
       Foreach 'timestamp' in 'DR_triggers_start_timestamp'
-
       and 'period_duration' in  'DR_triggers_duration_timestamp'
-
       When I create the 'string dictionary' named 'temp'
-
       and I move 'period_duration' in 'temp'
-
       and I copy the 'timestamp' to 'period_start' in 'temp'
-
-      and I create the copy of object named by 'timestamp' from dictionary
-      'sql_compact'
-
+      and I create the copy of object named by 'timestamp' from dictionary 'sql_compact'
       and I move the 'copy' to 'DR_value' in 'temp'
-
-      ## if timestamp is found then value different from zero, otherwise value
-      equal to 0
+      ## if timestamp is found then value different from zero, otherwise value equal to 0
 
       # exported
-
       If I verify the 'timestamp' is found in 'flux_compact_exported'
-
-      When I create the copy of object named by 'timestamp' from dictionary
-      'flux_compact_exported'
-
+      When I create the copy of object named by 'timestamp' from dictionary 'flux_compact_exported'
       and I move the 'copy' to 'energy_exported' in 'temp'
-
       EndIf
-
       If I verify the 'timestamp' is not found in 'flux_compact_exported'
-
       When I set 'energy_exported' to '0' as 'string'
-
       and I move 'energy_exported' in 'temp'
-
       EndIf
-
       # imported
-
       If I verify the 'timestamp' is found in 'flux_compact_imported'
-
-      When I create the copy of object named by 'timestamp' from dictionary
-      'flux_compact_imported'
-
+      When I create the copy of object named by 'timestamp' from dictionary 'flux_compact_imported'
       and I move the 'copy' to 'energy_imported' in 'temp'
-
       EndIf
-
       If I verify the 'timestamp' is not found in 'flux_compact_imported'
-
       When I set 'energy_imported' to '0' as 'string'
-
       and I move 'energy_imported' in 'temp'
-
       EndIf
-
       When I move 'temp' in 'results'
-
       EndForeach
 
-
       Then print the 'results'
-
       and print the 'time'
-
       and print the 'household_id'
     keysFile: 4_execute_flux_queries.keys
     next: 5_compute_reward.zen
   5_compute_reward.zen:
-    zenContent: >-
+    zenContent: |
       # keys
-
       Given I have a 'string' named 'day'
-
       and I have a 'string' named 'night'
-
       and I have a 'integer' named '0'
-
       and I have a 'integer' named '1'
-
       and I have a 'integer' named 'hundred'
 
-
       # data
-
       Given I have a 'integer array' named 'results'
-
       and I have a 'string' named 'time'
-
       and I have a 'string' named 'household_id'
 
-
-
       ## DR_value = 0 -> DR_action = ON
-
       ## DR_value = 1 -> DR_action = OFF
-
       When I create the 'string array' named 'output'
-
       Foreach 'dict' in 'results'
-
       When I create the 'string dictionary' named 'temp'
-
       and I copy contents of 'dict' in 'temp'
-
       When I pickup from path 'dict.DR_value'
-
       When I pickup from path 'dict.energy_imported'
-
       If I verify 'DR_value' is equal to '0'
-
       and I verify 'time' is equal to 'day'
-
       When I copy 'hundred' to 'reward_ratio'
-
       When I create the result of 'energy_imported / reward_ratio'
-
       and I rename 'result' to 'reward'
-
       and I remove 'reward_ratio'
-
       EndIf
-
       If I verify 'DR_value' is equal to '0'
-
       and I verify 'time' is equal to 'night'
-
       When I set 'reward_multipliers' to '15' as 'integer'
-
       When I set 'reward_ratio' to '1000' as 'integer'
-
-      When I create the result of '(energy_imported * reward_ratio) /
-      reward_ratio'
-
+      When I create the result of '(energy_imported * reward_ratio) / reward_ratio'
       and I rename 'result' to 'reward'
-
       and I remove 'reward_ratio'
-
       and I remove 'reward_multipliers'
-
       EndIf
-
       If I verify 'DR_value' is equal to '1'
-
       and I verify 'time' is equal to 'day'
-
       When I set 'reward_ratio' to '200' as 'integer'
-
       When I create the result of 'energy_imported / reward_ratio'
-
       and I rename 'result' to 'reward'
-
       and I remove 'reward_ratio'
-
       EndIf
-
       If I verify 'DR_value' is equal to '1'
-
       and I verify 'time' is equal to 'night'
-
       When I copy 'energy_imported' to 'reward'
-
       EndIf
-
       When I move 'reward' in 'temp'
-
       and I copy 'household_id' in 'temp'
-
       and I move 'temp' in 'output'
-
       and I remove 'DR_value'
-
       and I remove 'energy_imported'
-
       EndForeach
-
-
 
       Then print the 'output'
     keysFile: 5_compute_reward.keys

@@ -388,7 +388,8 @@ blocks:
       EndForeach
 
       # sign the result
-      When I create the eddsa signature of 'output'
+      When I create the json escaped string of 'output'
+      When I create the eddsa signature of 'json escaped string'
 
       Then print the 'eddsa signature'
       Then print the 'output'

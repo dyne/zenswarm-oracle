@@ -10,31 +10,27 @@ blocks:
       # data
       Given I have a 'string' named 'time'
 
-      When I create the 'string array' named 'urls_array'
       When I create the 'string array' named 'posts_array'
       Foreach 'el' in 'households_and_devices'
-      When I create the 'string dictionary' named 'post' 
+      When I create the 'string dictionary' named 'post'
       When I create the 'string dictionary' named 'data'
       and I move the 'el' to 'household' in 'data'
       and I copy 'time' in 'data'
       and I move 'data' in 'post'
       and I move 'post' in 'posts_array'
-      and I copy 'url' in 'urls_array'
       EndForeach
 
-      Then print the 'urls_array'
       Then print the 'posts_array'
+      Then print the 'url'
     keysFile: 1_create_rest_post.keys
     next: 2_execute_rest_post.zen
   2_execute_rest_post.zen:
-    zenContent: >
+    forEach: posts_array
+    index: temp_data
+    zenContent: |
       Rule caller restroom-mw
 
+      Given I connect to 'url' and pass it the content of 'temp_data' and save the output into 'post_result'
+      Given I have a 'string dictionary' named 'post_result'
 
-      Given I execute parallel POST with array 'posts_array' to array
-      'urls_array' and save the result named 'result'
-
-      Given I have a 'string array' named 'result'
-
-
-      Then print the 'result'
+      Then print data from 'post_result'

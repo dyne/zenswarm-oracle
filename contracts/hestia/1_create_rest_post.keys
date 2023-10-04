@@ -1,5 +1,5 @@
 {
-  "url": "insert_url",
+  "url": "http://127.0.0.1:3000/api/reward.chain",
   "households_and_devices": [
     [
       "NES-00000000323dcc4f",

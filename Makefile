@@ -18,9 +18,6 @@ setup:
 	@[ ! -x zenroom ] && \
 		wget https://github.com/dyne/zenroom/releases/latest/download/zenroom -O zenroom && \
 		chmod +x zenroom || exit 0
-	@[ ! -x restroom-test ] && \
-		wget https://github.com/dyne/zencode-tools/releases/latest/download/restroom-test -O restroom-test && \
-		chmod +x restroom-test || exit 0
 
 keygen: setup
 keygen: ## Generate a new oracle keyring [DESCRIPTION]
@@ -41,8 +38,11 @@ announce: ## Create and send a DID request for the oracle [ORACLE_KEYRING, URL]
 	tmp2=$$(mktemp); \
 	jq '.url = "${URL}"' announce_contracts/create_did.keys | tee $${tmp}; \
 	./zenroom -z -k ${SECRET}/keys.json -a $${tmp} announce_contracts/create_did.zen | tee $${tmp3}; \
-	./restroom-test -s ${RR_SCHEMA} -h ${RR_HOST} -p ${RR_PORT} -u ${RR_API} -a $${tmp3} \
-		| tee $${tmp2} ;\
+	curl -s -X "POST" "${RR_SCHEMA}://${RR_HOST}:${RR_PORT}/api/${RR_API}" \
+		-H 'accept: application/json' \
+		-H 'Content-Type: application/json' \
+		-d '{"data": '$$(cat $${tmp3})',"keys": {}}' \
+		| tee $${tmp2}; \
 	jq '{DID: .DID}' $${tmp2} > ${SECRET}/DID.json; \
 	curl -s $$(jq -r '.resolve_DID' $${tmp2}) | jq | tee ${SECRET}/DID_document.json; \
 	rm -f $${tmp} $${tmp2} $${tmp3};
@@ -61,7 +61,10 @@ goodbye: ## Oracle deannounce (deactivate DID) [ORACLE_KEYRING]
 	$(if $(wildcard ${ORACLE_KEYRING}),,$(error Oracle keyring not found in ${ORACLE_KEYRING}, add the right path as ORACLE_KEYRING="<path>"))
 	@tmp=$$(mktemp); \
 	./zenroom -z -a announce_contracts/deactivate_did.keys -k secrets/keys.json announce_contracts/deactivate_did.zen > $${tmp}; \
-	./restroom-test -s https -h did.dyne.org -p 443 -u v1/sandbox/pubkeys-deactivate.chain -a $${tmp} \
+	curl -s -X "POST" "https://did.dyne.org:443/api/v1/sandbox/pubkeys-deactivate.chain" \
+		-H 'accept: application/json' \
+		-H 'Content-Type: application/json' \
+		-d '{"data": '$$(cat $${tmp})',"keys": {}}' \
 		| jq '{DID: .result.didDocument.id}' \
 		| tee ${SECRET}/last_did_deactivated.json ;\
 	rm -f $${tmp};

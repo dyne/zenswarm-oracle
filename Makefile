@@ -51,7 +51,7 @@ run: ORACLE_TYPE ?= common
 run: ORACLE_NAME ?= zenswarm-oracle
 run: ## Run the oracle container [ORACLE_NAME, ORACLE_TYPE]
 	@[ -d logger ] || mkdir logger
-	ORACLE_NAME=${ORACLE_NAME} PORT=${PORT} HOST=${HOST} ORACLE_TYPE=${ORACLE_TYPE} SECRETS=${SECRET} docker compose -p ${ORACLE_NAME} up
+	ORACLE_NAME=${ORACLE_NAME} PORT=${PORT} HTTP_PORT=${PORT} HOST=${HOST} ORACLE_TYPE=${ORACLE_TYPE} SECRETS=${SECRET} docker compose -p ${ORACLE_NAME} up
 
 kill: ## Stop the oracle container
 	@docker compose down

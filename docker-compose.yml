@@ -15,6 +15,7 @@ services:
     environment:
       - LOGGER_DIR=/var/logger
       - HOST=${HOST:-0.0.0.0}
+      - HTTP_PORT=${HTTP_PORT}
       - SUBSCRIPTION_FILE=/var/secrets/subscriptions.json
     ports:
       - ${PORT}:3000

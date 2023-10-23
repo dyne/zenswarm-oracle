@@ -131,9 +131,9 @@ blocks:
       When I create the copy of element '1' in array 'DR_triggers_values'
       and I set 'DR_triggers_start_value' to '0' as 'string'
 
-      If I verify the 'copy' is equal to 'zero'
+      If I verify 'copy' is equal to 'zero'
       When I remove 'DR_triggers_start_value'
-      and I set 'DR_triggers_start_value' to '0' as 'string'
+      and I set 'DR_triggers_start_value' to '1' as 'string'
       EndIf
 
       If I verify the 'start_timestamp' is not found in 'sql_compact'

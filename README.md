@@ -31,12 +31,17 @@ Before using Zenswarm oracle you need:
 * [Zenroom](https://zenroom.org/#downloads)
 * Jq
 * Docker
-* [Restroom-test](https://github.com/dyne/zencode-tools/releases/latest/)
 
 The `SECRET` directory will be shared with the zenswarm oracle container (by default is called `secrets`).
 For example, this will let the oracle read the keyring we are going to generate.
 
-The following commands also need a restroom instance with an Admin Keyring, you have to set the variables `RR_HOST`, `RR_PORT`, `RR_SCHEMA` and `RR_API` in the Makefile.
+The following commands also need a restroom instance with an Admin Keyring, you have to set the variables `RR_HOST`, `RR_PORT`, `RR_SCHEMA` and `RR_API` in the Makefile. To test the oracle you can use our apiroom instance with the following setting:
+```
+RR_PORT := 443
+RR_HOST := apiroom.net
+RR_SCHEMA := https
+RR_API := W3CDID/create_sandbox_zenswarm_did.chain
+```
 
 The first step is to generate the keyring of the oracle
 ```bash

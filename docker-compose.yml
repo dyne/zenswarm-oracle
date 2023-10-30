@@ -19,3 +19,4 @@ services:
       - SUBSCRIPTION_FILE=/var/secrets/subscriptions.json
     ports:
       - ${PORT}:3000
+    restart: always

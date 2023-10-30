@@ -1,0 +1,62 @@
+Scenario 'ethereum': call a generic solidity smart contract
+
+# In this example we are:
+# 1) creating an ethereum transaction
+# 2) modifying it to call a solidity SC on-chain
+# 3) signing the transaction, which is ready to be broadcasted
+
+# Here we are loading our private key
+Given I am 'Alice'
+Given I have my 'keyring'
+
+# Here we load everything we need to create a raw transaction, named the chain-id, the gas price,
+# the gas limit and the nonce
+Given I have a 'string' named 'myChain-hex'
+Given I have a  'gas price'
+Given I have a 'gas limit'
+Given I have an 'ethereum nonce'
+
+# here we load the data about the solidity sc, so first its address:
+Given I have a 'ethereum address' named 'solidity address'
+# and the method we want to call, its input types and its output type
+Given I have a 'ethereum method' named 'myMethod'
+
+
+# Here we are setting up the parameters we want to pass to the SC
+Given I have an 'hex' named 'parameter1'
+Given I have an 'integer' named 'parameter2'
+Given I have an 'string' named 'parameter3'
+
+# Here we first create the transaction that will call the solidity SC
+When I create the ethereum transaction to 'solidity address'
+
+# Here we do some data manypulation to insert the parameters in an array, containing the input to the solidity SC
+# the array could have been generated already. It's important that the parameters are inserted in the
+# array according to the types contained in the array myMethod.input
+When I create the new array
+When I rename the 'new array' to 'myParams'
+When I move 'parameter1' in 'myParams'
+When I move 'parameter2' in 'myParams'
+When I move 'parameter3' in 'myParams'
+
+# Here we are modifying the ethereum transaction by adding solidity SC info and the data we want to pass it
+When I use the ethereum transaction to run 'myMethod' using 'myParams'
+# We are creaging a copy that we can later print, in order to keep a state for debug purposes
+When I copy 'ethereum transaction' to 'ethereum transaction unsigned'
+
+# Here we signed the transaction containing the solidity SC info and the input parameters
+# this statement produces a signed raw transaction, ready to be broadcaste
+When I create the signed ethereum transaction for chain '0x13881'
+# And again we are creaging a copy that we can later print, in order to keep a state for debug purposes
+When I copy 'signed ethereum transaction' to 'signed ethereum transaction to solidity'
+
+Then print the 'signed ethereum transaction to solidity'
+
+# To broad the transaction you can use the broadcast statement in Restroom-mw, example here:
+# https://github.com/dyne/restroom-mw/blob/master/test/fixtures/ethereum_store.zen
+# https://github.com/dyne/restroom-mw/blob/master/test/fixtures/ethereum_store.keys
+
+# We can also print the two previous states of the ethereum transaction by uncommenting the lines below:
+# Then print the 'ethereum transaction unsigned'
+# Then print the 'ethereum transaction'
+

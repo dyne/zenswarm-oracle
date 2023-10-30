@@ -1,5 +1,0 @@
-{
-  "evm_endpoint": "http://ganache.dyne.org:9485",
-  "gas limit": "100000",
-  "storage_contract": "662c4017c01ba23c94257289dab8c2757b472b81"
-}

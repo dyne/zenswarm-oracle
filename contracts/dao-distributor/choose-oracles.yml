@@ -3,7 +3,7 @@ start: chooseoracles0.zen
 blocks:
   chooseoracles0.zen:
     zenContent: |
-      Rule caller restroom-mw
+      Rule unknown ignore
 
       Scenario 'ethereum': convert from event data
       Given I read the content of 'keys.json'
@@ -18,9 +18,9 @@ blocks:
       Given I rename 'data' to 'encoded data'
       Given I have a 'string array' named 'typeSpec'
       When I create the ethereum abi decoding of 'encoded data' using 'typeSpec'
-      When I create the copy of element '1' in array 'ethereum abi decoding'
+      When I create the copy of element '1' from array 'ethereum abi decoding'
       When I rename 'copy' to 'request_id'
-      When I create the copy of element '3' in array 'ethereum abi decoding'
+      When I create the copy of element '3' from array 'ethereum abi decoding'
       When I rename 'copy' to 'dao_vote_id'
 
       When I create the 'string dictionary'
@@ -42,15 +42,14 @@ blocks:
     next: chooseoracles1.zen
   chooseoracles1.zen:
     zenContent: >
-      Rule caller restroom-mw
+      Rule unknown ignore
 
       Given I have a database uri named 'database'
-
-      Given I have a 'string array' named 'post'
 
       Given I execute the SQL statement named 'read_oracles' on the database
       named 'database' and save the result into 'dids'
 
+      Given I have a 'string array' named 'post'
 
       Given I have a 'string array' named 'dids'
 
@@ -94,7 +93,7 @@ blocks:
     next: chooseoracles2.zen
   chooseoracles2.zen:
     zenContent: >
-      Rule caller restroom-mw
+      Rule unknown ignore
 
 
       Scenario 'w3c':
@@ -106,32 +105,27 @@ blocks:
 
       Given I read the content of './urls.json'
 
+      Given I execute parallel GET to array 'chosen_dids' and save the result
+      named 'results' within the object 'output'
+
 
       Given my name is in a 'string' named 'identity'
 
       Given I have my 'keyring'
 
-
       Given I have a 'hex' named 'caller address'
 
-
-
       Given I have a 'string' named 'message'
-
 
       Given I have a 'string array' named 'post'
 
       Given I have a 'string array' named 'results' in 'output'
 
-      Given I execute parallel GET to array 'chosen_dids' and save the result
-      named 'results' within the object 'output'
-
-
       Given I have a 'string' named 'api name'
 
 
       Given I have a 'string array' named 'typeSpec'
-      
+
       Given I have a 'integer' in path 'post.data.dao_vote_id'
 
 
@@ -215,9 +209,9 @@ blocks:
 
       Then print the 'oracle urls'
 
-      Then print the 'post' 
+      Then print the 'post'
 
-      Then print the 'signatures' 
+      Then print the 'signatures'
 
       Then print the 'abi_encodings'
 
@@ -226,8 +220,8 @@ blocks:
     next: chooseoracles3.zen
   chooseoracles3.zen:
     zenContent: |
-      # Always use 'Rule caller restroom-mw' when using Restroom
-      Rule caller restroom-mw
+      # Always use 'Rule unknown ignore' when using Restroom
+      Rule unknown ignore
 
 
       Given I have a 'string array' named 'keccaks'
@@ -265,37 +259,27 @@ blocks:
     next: chooseoracles4.zen
   chooseoracles4.zen:
     zenContent: >
-      # Always use 'Rule caller restroom-mw' when using Restroom
+      # Always use 'Rule unknown ignore' when using Restroom
 
-      Rule caller restroom-mw
+      Rule unknown ignore
+
+      Given I fetch the local timestamp and store it into 'timestamp'
+
+      Given I execute parallel POST with array 'posts' to array 'oracle_urls'
+      and save the result named 'output'
+
 
       Given I have a 'string array' named 'keccaks'
 
       Given I have a 'string array' named 'abi_encodings'
 
-
-      # [R] Restroom-mw statements: state endpoints
-
       Given I have a 'string array' named 'oracle_urls'
 
-
-      # Loading input data and telling Zenroom that 'post' will be created by
-      Restroom-mw
-
       Given I have a 'string dictionary' named 'posts'
-
-
-      # Here Restroom-mw performs the REST calls and stores the output in
-      'output'
-
-      Given I fetch the local timestamp and store it into 'timestamp' 
 
       Given I have a 'string' named 'timestamp'
 
       Given I have a 'string dictionary' named 'output'
-
-      Given I execute parallel POST with array 'posts' to array 'oracle_urls'
-      and save the result named 'output'
 
       When I create the json escaped string of 'output'
 
@@ -317,26 +301,23 @@ blocks:
     next: chooseoracles5.zen
   chooseoracles5.zen:
     zenContent: >
-      Rule caller restroom-mw
-
-
-      Given I have a 'string array' named 'keccaks'
-
-      Given I have a 'string array' named 'abi_encodings'
-
+      Rule unknown ignore
 
       Given I have a database uri named 'database'
-
-      Given I have a 'string array' named 'database_actions_result'
-
-      Given I have a 'string array' named 'query_params'
 
       Given I execute the SQL statement named 'insert_log' pass the parameters
       named 'query_params' on the database named 'database' and save the result
       into 'database_actions_result'
 
+      Given I have a 'string array' named 'keccaks'
 
-      When I create the copy of element '2' in array 'query_params'
+      Given I have a 'string array' named 'abi_encodings'
+
+      Given I have a 'string array' named 'database_actions_result'
+
+      Given I have a 'string array' named 'query_params'
+
+      When I create the copy of element '2' from array 'query_params'
 
       When I create the json unescaped object of 'copy'
 

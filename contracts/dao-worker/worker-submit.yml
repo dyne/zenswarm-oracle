@@ -3,7 +3,7 @@ start: worker-submit0.zen
 blocks:
   worker-submit0.zen:
     zenContent: |
-      Rule caller restroom-mw
+      Rule unknown ignore
 
       Scenario 'ethereum': read eth address
 
@@ -21,7 +21,7 @@ blocks:
     next: worker-submit1.zen
   worker-submit1.zen:
     zenContent: >
-      Rule caller restroom-mw
+      Rule unknown ignore
 
       Scenario ethereum: verify sig
 
@@ -30,13 +30,20 @@ blocks:
 
       Given I read the content of 'oracle.json'
 
-
       Given I have a ethereum endpoint named 'eth_url'
+
+      Given I read the ethereum nonce for 'ethereum_address'
+
+      Given that I have an endpoint named 'endpoint'
+
+      Given I connect to 'endpoint' and save the output into 'dataFromEndpoint'
+
+      Given I read the ethereum suggested gas price
 
 
       Given I have a 'ethereum signature' named 'signature'
 
-      GIven I rename 'signature' to 'ethereum signature'
+      Given I rename 'signature' to 'ethereum signature'
 
 
       Given I have a 'string' named 'non verified'
@@ -48,9 +55,6 @@ blocks:
       Given I have a 'string array' named 'typeSpec'
 
       Given I have a 'string' named 'chain id'
-
-
-      Given I read the ethereum nonce for 'ethereum_address'
 
 
       # in this script we verify an array of signatures against an array of
@@ -77,26 +81,15 @@ blocks:
       Given I have a 'hex' named 'caller address'
 
 
-      Given I have a ethereum endpoint named 'eth_url'
-
       Given I have a 'ethereum address' named 'oracle address'
 
       Given I have a 'ethereum nonce'
 
       Given I have a 'ethereum method' named 'submitMethod'
 
-      # Given I read the ethereum nonce for 'ethereum address'
-
-      Given I read the ethereum suggested gas price
-
-
-      Given that I have an endpoint named 'endpoint'
-
+      # Given I read the ethereum nonce for 'ethereum address
 
       Given I have a 'string dictionary' named 'dataFromEndpoint'
-
-
-      Given I connect to 'endpoint' and save the output into 'dataFromEndpoint'
 
 
       Given I have a 'ethereum signature array' in path
@@ -106,9 +99,6 @@ blocks:
       'dataFromEndpoint.result.addresses'
 
       Given I have a 'string' in path 'dataFromEndpoint.result.signed-string'
-
-
-      Given I read the ethereum suggested gas price
 
       Given I have a 'gas price'
 
@@ -221,9 +211,6 @@ blocks:
       When I create the signed ethereum transaction for chain 'chain id'
 
 
-      Then I ask ethereum to broadcast the 'signed_ethereum_transaction' and
-      save the transaction id in 'txid'
-
       Then print the 'signed ethereum transaction'
 
 
@@ -244,4 +231,7 @@ blocks:
 
 
       Then print the 'ethereum address'
+
+      Then I ask ethereum to broadcast the 'signed_ethereum_transaction' and
+      save the transaction id in 'txid'
     keysFile: worker-submit1.keys

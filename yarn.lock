@@ -4495,9 +4495,9 @@ yauzl@^2.10.0:
     buffer-crc32 "~0.2.3"
     fd-slicer "~1.1.0"
 
-zenroom@3.23.4:
-  version "3.23.4"
-  resolved "https://registry.yarnpkg.com/zenroom/-/zenroom-3.23.4.tgz#6a0b88515ce2ce146a2595bbb84a05531412884e"
-  integrity sha512-ZcgLydUXqviQzmehQy2bnuQiuPEhRBAGSLZZN3YiaIQ4uo6e5RjG3/EiRDFJV5shiKH09fhhb8ci5ORbd4kcoQ==
+zenroom@latest:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/zenroom/-/zenroom-4.0.0.tgz#2fceb09ab53959c5d88f5dcb7b80f25a0fc7c60c"
+  integrity sha512-RRRwdJ7k4QKTB7XCLpmHpU9fPBwxjIX69SUiJVvwq1AX3xSUCFQLHOArMZu8PN7lYM5B4dwiihkiE9ZCR3YfNA==
   dependencies:
     yarn "^1.22.19"

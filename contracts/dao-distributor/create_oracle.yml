@@ -3,7 +3,7 @@ start: 1_create_request.zen
 blocks:
   1_create_request.zen:
     zenContent: |
-      Rule caller restroom-mw
+      Rule unknown ignore
       Rule input encoding base58
       Rule output encoding base58
 
@@ -15,10 +15,10 @@ blocks:
 
       # timestamp in messages to avoid replay attack
       Given I fetch the local timestamp and store it into 'timestamp'
-      Given I have a 'string' named 'timestamp'
-
       # load the spec admin keyring to sign the request
       Given I read the content of 'keys.json'
+
+      Given I have a 'string' named 'timestamp'
       Given my name is in a 'string' named 'identity'
       and I have my 'keyring'
 
@@ -29,16 +29,16 @@ blocks:
       Given I have a 'string' named 'signer_did_spec'
 
       # did document signature
-      When I create the json of 'did document'
-      and I create the ecdh signature of 'json'
-      and I remove 'json'
+      When I create the  json escaped string of 'did document'
+      and I create the ecdh signature of 'json escaped string'
+      and I remove 'json escaped string'
 
       # result signature
       When I create the 'string dictionary' named 'result'
       and I copy 'did document' in 'result'
       and I copy 'timestamp' in 'result'
-      and I create the json of 'result'
-      and I create the eddsa signature of 'json'
+      and I create the json escaped string of 'result'
+      and I create the eddsa signature of 'json escaped string'
 
       # signer id
       When I create the eddsa public key
@@ -63,17 +63,17 @@ blocks:
     next: 2_prepare_post.zen
   2_prepare_post.zen:
     zenContent: |
-      Rule caller restroom-mw
+      Rule unknown ignore
       Scenario 'ecdh': keys
       Scenario 'eddsa': keys
       Scenario 'ethereum': keys
       Scenario 'reflow': keys
 
-      Given I have a 'string dictionary' named 'storage_result'
       Given I have a database uri named 'database'
-      Given I have a 'string dictionary' named 'did document'
       Given I execute the SQL statement named 'insert_query' pass the parameters named 'query_params' on the database named 'database' and save the result into 'storage_result'
 
+      Given I have a 'string dictionary' named 'storage_result'
+      Given I have a 'string dictionary' named 'did document'
       and I have a 'string dictionary' named 'ecdh signature'
       and I have a 'string' named 'timestamp'
       and I have a 'string' named 'eddsa signature'
@@ -94,10 +94,10 @@ blocks:
     next: 3_send_post.zen
   3_send_post.zen:
     zenContent: |
-      Rule caller restroom-mw
+      Rule unknown ignore
 
-      Given I have a 'string dictionary' named 'storage_result'
       Given I connect to 'endpoint' and pass it the content of 'post' and save the output into 'response'
+      Given I have a 'string dictionary' named 'storage_result'
       and I have a 'string dictionary' named 'response'
 
       When I pickup from path 'response.status'

@@ -3,7 +3,7 @@ start: 1_create_sql_queries.zen
 blocks:
   1_create_sql_queries.zen:
     zenContent: |
-      Rule caller restroom-mw
+      Rule unknown ignore
 
       Given I fetch the local timestamp and store it into 'final_timestamp'
       Given I have a 'integer' named 'final_timestamp'
@@ -71,13 +71,14 @@ blocks:
     next: 2_execute_sql_queries.zen
   2_execute_sql_queries.zen:
     zenContent: |
-      Rule caller restroom-mw
+      Rule unknown ignore
 
       Given I have a database uri named 'database'
       Given I execute the SQL statement named 'query_period' on the database named 'database' and save the result into 'sql_period_result'
-      Given I have a 'string array' named 'sql_period_result'
 
       Given I execute the SQL statement named 'query_get_latest' on the database named 'database' and save the result into 'sql_latest_result'
+
+      Given I have a 'string array' named 'sql_period_result'
       Given I have a 'string array' named 'sql_latest_result'
 
       # keys
@@ -116,9 +117,9 @@ blocks:
       and I remove 'control'
       Endforeach
 
-      When I create the length of 'sql_period_result'
-      If I verify 'length' is equal to 'zero'
-      When I create the copy of element '1' in array 'sql_latest_result'
+      When I create the size of 'sql_period_result'
+      If I verify 'size' is equal to 'zero'
+      When I create the copy of element '1' from array 'sql_latest_result'
       and I pickup from path 'copy.control'
       and I remove 'copy'
       and I create the json unescaped object of 'control'
@@ -128,7 +129,7 @@ blocks:
       and I move named by 'start_timestamp' in 'sql_compact'
       EndIf
 
-      When I create the copy of element '1' in array 'DR_triggers_values'
+      When I create the copy of element '1' from array 'DR_triggers_values'
       and I set 'DR_triggers_start_value' to '0' as 'string'
 
       If I verify 'copy' is equal to 'zero'
@@ -235,13 +236,14 @@ blocks:
     next: 4_execute_flux_queries.zen
   4_execute_flux_queries.zen:
     zenContent: |
-      Rule caller restroom-mw
+      Rule unknown ignore
 
       Given I connect to influxdb with the connection object named 'influx'
       Given I execute the array of flux queries named 'flux_queries_exported' and save the output into 'flux_result_exported'
-      Given I have a 'string array' named 'flux_result_exported'
 
       Given I execute the array of flux queries named 'flux_queries_imported' and save the output into 'flux_result_imported'
+
+      Given I have a 'string array' named 'flux_result_exported'
       Given I have a 'string array' named 'flux_result_imported'
 
       # data
@@ -326,7 +328,7 @@ blocks:
     next: 5_compute_reward.zen
   5_compute_reward.zen:
     zenContent: |
-      Rule caller restroom-mw
+      Rule unknown ignore
       Scenario 'eddsa': sign
 
       Given I read the content of 'keys.json'

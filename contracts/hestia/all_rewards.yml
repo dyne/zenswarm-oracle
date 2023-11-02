@@ -28,7 +28,7 @@ blocks:
     forEach: posts_array
     index: temp_data
     zenContent: |
-      Rule caller restroom-mw
+      Rule unknown ignore
 
       Given I connect to 'url' and pass it the content of 'temp_data' and save the output into 'post_result'
       Given I have a 'string dictionary' named 'post_result'

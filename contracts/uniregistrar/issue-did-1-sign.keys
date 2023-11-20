@@ -1,3 +1,6 @@
 {
-  "signer_did_spec": "sandbox.uniregistrar_A"
+  "signer_did_spec": "sandbox.uniregistrar_A",
+  "create": "create",
+  "update": "update",
+  "deactivate": "deactivate"
 }

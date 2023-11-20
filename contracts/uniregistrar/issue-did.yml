@@ -21,12 +21,21 @@ blocks:
 
       # keys
       Given I have a 'string' named 'signer_did_spec'
+      and I have a 'string' named 'create'
+      and I have a 'string' named 'update'
+      and I have a 'string' named 'deactivate'
 
       # data
       Given I have a 'string dictionary' named 'didDocument'
       and I rename 'didDocument' to 'did_document'
+      and I have a 'string' named 'operation'
 
-      # did document with timestamp signature
+      When I create the 'string dictionary' named 'post'
+      and I create the 'string dictionary' named 'data'
+
+      ## create
+      If I verify 'operation' is equal to 'create'
+      # did + timestamp signature
       When I create the 'string dictionary' named 'result'
       and I copy 'did_document' in 'result'
       and I copy 'timestamp' in 'result'
@@ -34,9 +43,105 @@ blocks:
       and I create the eddsa signature of 'json escaped string'
       and I remove 'json escaped string'
 
-      # did document signature
+      # did signature
       When I create the json escaped string of 'did_document'
       and I create the ecdh signature of 'json escaped string'
+
+      # convert ecdh sign to base58
+      When I rename 'ecdh signature' to 'ecdh_b64'
+      and I create the 'string dictionary' named 'ecdh signature'
+      When I write string '' in 'r'
+      and I create the copy of 'r' from 'ecdh_b64'
+      and I append the 'base58' of 'copy' to 'r'
+      and I remove 'copy'
+      and I move 'r' in 'ecdh signature'
+      When I write string '' in 's'
+      and I create the copy of 's' from 'ecdh_b64'
+      and I append the 'base58' of 'copy' to 's'
+      and I remove 'copy'
+      and I move 's' in 'ecdh signature'
+
+      # convert eddsa signature
+      When I rename 'eddsa signature' to 'eddsa_old'
+      and I write string '' in 'eddsa signature'
+      and I append the 'base58' of 'eddsa_old' to 'eddsa_signature'
+
+      # load everything in data
+      When I move 'did document' in 'data'
+      and I move 'timestamp' in 'data'
+      and I move 'eddsa signature' in 'data'
+      and I move 'ecdh signature' in 'data'
+
+      When I write string 'https://did.dyne.org/api/v1/sandbox/pubkeys-accept.chain' in 'did_url'
+      EndIf
+
+      ## update
+      If I verify 'operation' is equal to 'update'
+      # did + timestamp signature
+      When I create the 'string dictionary' named 'result'
+      and I copy 'did_document' in 'result'
+      and I copy 'timestamp' in 'result'
+      and I create the json escaped string of 'result'
+      and I create the eddsa signature of 'json escaped string'
+      and I remove 'json escaped string'
+
+      # did signature
+      When I create the json escaped string of 'did_document'
+      and I create the ecdh signature of 'json escaped string'
+
+      # convert ecdh sign to base58
+      When I rename 'ecdh signature' to 'ecdh_b64'
+      and I create the 'string dictionary' named 'ecdh signature'
+      When I write string '' in 'r'
+      and I create the copy of 'r' from 'ecdh_b64'
+      and I append the 'base58' of 'copy' to 'r'
+      and I remove 'copy'
+      and I move 'r' in 'ecdh signature'
+      When I write string '' in 's'
+      and I create the copy of 's' from 'ecdh_b64'
+      and I append the 'base58' of 'copy' to 's'
+      and I remove 'copy'
+      and I move 's' in 'ecdh signature'
+
+      # convert eddsa signature
+      When I rename 'eddsa signature' to 'eddsa_old'
+      and I write string '' in 'eddsa signature'
+      and I append the 'base58' of 'eddsa_old' to 'eddsa_signature'
+
+      # load everything in data
+      When I move 'did document' in 'data'
+      and I move 'timestamp' in 'data'
+      and I move 'eddsa signature' in 'data'
+      and I move 'ecdh signature' in 'data'
+
+      When I write string 'https://did.dyne.org/api/v1/sandbox/pubkeys-update.chain' in 'did_url'
+      EndIf
+
+      # deactivate
+      If I verify 'operation' is equal to 'deactivate'
+      When I pickup from path did_document.id'
+      When I create the ecdh signature of 'id'
+
+      # convert ecdh sign to base58
+      When I rename 'ecdh signature' to 'ecdh_b64'
+      and I create the 'string dictionary' named 'ecdh signature'
+      When I write string '' in 'r'
+      and I create the copy of 'r' from 'ecdh_b64'
+      and I append the 'base58' of 'copy' to 'ecdh signature'
+      and I remove 'copy'
+      and I move 'r' in 'ecdh signature'
+      When I write string '' in 's'
+      and I create the copy of 's' from 'ecdh_b64'
+      and I append the 'base58' of 'copy' to 'ecdh signature'
+      and I remove 'copy'
+      and I move 's' in 'ecdh signature'
+
+      # load everything in data
+      When I move 'id' to 'deactivate_id' in 'data'
+      and I move 'ecdh signature' in 'data'
+
+      When I write string 'https://did.dyne.org/api/v1/sandbox/pubkeys-deactivate.chain' in 'did_url'
+      EndIf
 
       # signer id
       When I create the eddsa public key
@@ -44,38 +149,17 @@ blocks:
       and I append 'signer_did_spec' to 'id'
       and I append the string ':' to 'id'
       and I append the 'base58' of 'eddsa public key' to 'id'
+      and I move 'id' in 'data'
+
+      # post
+      When I move 'data' in 'post'
 
       # print did document, signature and signer id
-      Then print the 'did document'
-      Then print the 'ecdh signature'
-      Then print the 'timestamp'
-      Then print the 'eddsa signature'
-      Then print the 'id'
-    keysFile: issue-did-1-sign.keys
-    next: issue-did-2-post.zen
-  issue-did-2-post.zen:
-    zenContent: |
-      Rule unknown ignore
-
-      Given I have a 'string dictionary' named 'did document'
-      and I have a 'string dictionary' named 'ecdh signature'
-      and I have a 'string' named 'timestamp'
-      and I have a 'string' named 'eddsa signature'
-      and I have a 'string' named 'id'
-
-      # prepare post for did
-      When I create the 'string dictionary' named 'post'
-      and I create the 'string dictionary' named 'data'
-      and I move 'did document' in 'data'
-      and I move 'timestamp' in 'data'
-      and I move 'eddsa signature' in 'data'
-      and I move 'ecdh signature' in 'data'
-      and I move 'id' in 'data'
-      and I move 'data' in 'post'
-
       Then print the 'post'
-    next: issue-did-3-publish.zen
-  issue-did-3-publish.zen:
+      and print the 'did_url'
+    keysFile: issue-did-1-sign.keys
+    next: issue-did-2-publish.zen
+  issue-did-2-publish.zen:
     zenContent: |
       Rule unknown ignore
 
@@ -86,4 +170,3 @@ blocks:
       Given I have a 'string dictionary' named 'did_result'
 
       Then print the 'did_result'
-    keysFile: issue-did-3-publish.keys

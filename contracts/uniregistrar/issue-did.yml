@@ -119,7 +119,7 @@ blocks:
 
       # deactivate
       If I verify 'operation' is equal to 'deactivate'
-      When I pickup from path did_document.id'
+      When I pickup from path 'did_document.id'
       When I create the ecdh signature of 'id'
 
       # convert ecdh sign to base58
@@ -127,17 +127,17 @@ blocks:
       and I create the 'string dictionary' named 'ecdh signature'
       When I write string '' in 'r'
       and I create the copy of 'r' from 'ecdh_b64'
-      and I append the 'base58' of 'copy' to 'ecdh signature'
+      and I append the 'base58' of 'copy' to 'r'
       and I remove 'copy'
       and I move 'r' in 'ecdh signature'
       When I write string '' in 's'
       and I create the copy of 's' from 'ecdh_b64'
-      and I append the 'base58' of 'copy' to 'ecdh signature'
+      and I append the 'base58' of 'copy' to 's'
       and I remove 'copy'
       and I move 's' in 'ecdh signature'
 
       # load everything in data
-      When I move 'id' to 'deactivate_id' in 'data'
+      When I move the 'id' to 'deactivate_id' in 'data'
       and I move 'ecdh signature' in 'data'
 
       When I write string 'https://did.dyne.org/api/v1/sandbox/pubkeys-deactivate.chain' in 'did_url'
